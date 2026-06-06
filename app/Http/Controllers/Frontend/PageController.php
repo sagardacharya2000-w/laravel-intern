@@ -10,4 +10,9 @@ class PageController extends Controller
     {
         return view('home.index');
     }
+
+    public function login()
+    {
+        return view('auth.login');
+    }
 }
