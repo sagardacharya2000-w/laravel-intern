@@ -1,4 +1,4 @@
-<nav class="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur-sm text-m">
+{{-- <nav class="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur-sm text-m">
     <div class="max-w-5xl mx-auto flex h-14 items-center justify-between px-8">
         <a href="{{ url('/') }}" class="text-2xl font-bold tracking-tight text-slate-900">
             <span class="text-blue-600">EMS.</span>
@@ -24,4 +24,4 @@
             Sign in
         </a>
     </div>
-</nav>
+</nav> --}}
