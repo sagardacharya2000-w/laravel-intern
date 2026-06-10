@@ -1,8 +1,7 @@
-@extends('components.layout')
-
-@section('title', 'Sign In')
-
-@section('content')
+<x-layout>
+    <x-slot name="title">
+        Sign In
+    </x-slot>
 
     <section class="min-h-[calc(100vh-4rem)] flex items-center justify-center px-8 py-16">
 
@@ -23,20 +22,40 @@
                 @csrf
 
                 <div>
-                    <label for="username" class="block text-base font-medium text-slate-700 mb-1.5">Username</label>
-                    <input id="username" name="username" type="text" required autofocus value="{{ old('username') }}"
+                    <label for="username" class="block text-base font-medium text-slate-700 mb-1.5">
+                        Username
+                    </label>
+
+                    <input
+                        id="username"
+                        name="username"
+                        type="text"
+                        required
+                        autofocus
+                        value="{{ old('username') }}"
                         class="w-full text-base px-4 py-2 text-slate-900 bg-white border border-slate-200 rounded-[10px] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-colors"
-                        placeholder="Enter your username" />
+                        placeholder="Enter your username"
+                    />
+
                     @error('username')
                         <p class="text-sm text-red-500 mt-1.5">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
-                    <label for="password" class="block text-base font-medium text-slate-700 mb-1.5">Password</label>
-                    <input id="password" name="password" type="password" required
+                    <label for="password" class="block text-base font-medium text-slate-700 mb-1.5">
+                        Password
+                    </label>
+
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        required
                         class="w-full text-base px-4 py-2 text-slate-900 bg-white border border-slate-200 rounded-[10px] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-colors"
-                        placeholder="Enter your password" />
+                        placeholder="Enter your password"
+                    />
+
                     @error('password')
                         <p class="text-sm text-red-500 mt-1.5">{{ $message }}</p>
                     @enderror
@@ -46,7 +65,8 @@
                     <p class="text-sm text-red-500">{{ $errors->first() }}</p>
                 @endif
 
-                <button type="submit"
+                <button
+                    type="submit"
                     class="font-medium text-base w-full text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-[10px] transition-colors">
                     Sign in
                 </button>
@@ -60,5 +80,4 @@
         </div>
 
     </section>
-
-@endsection
+</x-layout>
