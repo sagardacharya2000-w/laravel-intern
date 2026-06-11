@@ -16,7 +16,7 @@ class StudentController extends Controller
     }
     public function exams()
     {
-        return view('student.exam');
+        return view('student.exams');
     }
     public function result()
     {

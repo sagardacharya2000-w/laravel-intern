@@ -1,27 +1,71 @@
 <x-student>
-    <div class="space-y-6">
 
-        <h1 class="text-2xl font-bold">My Courses</h1>
+<div class="space-y-8">
 
-        <div class="grid md:grid-cols-3 gap-4">
+<!-- Header -->
+<div>
+    <h1 class="text-3xl font-bold text-(--text)">My Classes & Subjects</h1>
+    <p class="text-sm text-(--muted)">
+        Enrolled classes and academic subjects
+    </p>
+</div>
 
-            <!-- Course Card -->
-            <div class="bg-white p-4 rounded shadow">
-                <h2 class="font-semibold text-lg">Web Development</h2>
-                <p class="text-sm text-gray-500">Learn HTML, CSS, JS</p>
-            </div>
+<!-- Class Cards -->
+<div class="grid md:grid-cols-3 gap-6">
 
-            <div class="bg-white p-4 rounded shadow">
-                <h2 class="font-semibold text-lg">Database Systems</h2>
-                <p class="text-sm text-gray-500">SQL, ER Diagram, Normalization</p>
-            </div>
+    <!-- Class 10 -->
+    <div class="bg-white p-5 rounded-lg shadow border border-(--border)">
+        <h2 class="text-xl font-bold">Class 10</h2>
+        <p class="text-sm text-(--muted)">Secondary Level</p>
 
-            <div class="bg-white p-4 rounded shadow">
-                <h2 class="font-semibold text-lg">Software Engineering</h2>
-                <p class="text-sm text-gray-500">SDLC, UML, Project Design</p>
-            </div>
-
+        <div class="mt-4 space-y-2 text-sm">
+            <p>📘 Mathematics</p>
+            <p>📗 Science</p>
+            <p>📙 English</p>
+            <p>📕 Computer</p>
         </div>
 
+        <button class="mt-4 w-full py-2 bg-(--blue) text-white rounded">
+            View Subjects
+        </button>
     </div>
+
+    <!-- Class 11 -->
+    <div class="bg-white p-5 rounded-lg shadow border border-(--border)">
+        <h2 class="text-xl font-bold">Class 11 (Science)</h2>
+        <p class="text-sm text-(--muted)">Higher Secondary</p>
+
+        <div class="mt-4 space-y-2 text-sm">
+            <p>📘 Physics</p>
+            <p>📗 Chemistry</p>
+            <p>📙 Mathematics</p>
+            <p>📕 Computer Science</p>
+        </div>
+
+        <button class="mt-4 w-full py-2 bg-(--blue) text-white rounded">
+            View Subjects
+        </button>
+    </div>
+
+    <!-- Class 12 -->
+    <div class="bg-white p-5 rounded-lg shadow border border-(--border)">
+        <h2 class="text-xl font-bold">Class 12</h2>
+        <p class="text-sm text-(--muted)">Final Year</p>
+
+        <div class="mt-4 space-y-2 text-sm">
+            <p>📘 Physics</p>
+            <p>📗 Chemistry</p>
+            <p>📙 Mathematics</p>
+            <p>📕 English</p>
+        </div>
+
+        <button class="mt-4 w-full py-2 bg-(--blue) text-white rounded">
+            View Subjects
+        </button>
+    </div>
+
+</div>
+
+</div>
+
 </x-student>

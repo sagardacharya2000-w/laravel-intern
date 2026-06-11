@@ -10,7 +10,7 @@
         <div class="flex items-center gap-4 mb-6">
 
             <div
-                class="h-20 w-20 rounded-full bg-(--primary) text-white flex items-center justify-center text-3xl font-bold">
+                class="h-20 w-20 rounded-full bg-(--blue-dark) text-white flex items-center justify-center text-3xl font-bold">
                 K
             </div>
 
@@ -50,7 +50,7 @@
 
         </div>
 
-        <a href="" class="inline-block px-4 py-2 mt-6 rounded bg-(--primary) text-white hover:bg-(--primary-dark)">
+        <a href="" class="inline-block px-4 py-2 mt-4 rounded bg-(--blue) text-white hover:bg-(--blue-dark)">
             Edit Profile
         </a>
 
