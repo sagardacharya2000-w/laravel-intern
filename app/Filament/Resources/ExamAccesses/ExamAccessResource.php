@@ -18,7 +18,11 @@ class ExamAccessResource extends Resource
 {
     protected static ?string $model = ExamAccess::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendar;
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Exam Management';
+
+    protected static ?int $navigationSort = 3;
 
     public static function form(Schema $schema): Schema
     {
