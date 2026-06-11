@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\QuestionSets\Schemas;
 
+use App\Models\Subject;
+use App\Models\User;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
@@ -12,12 +15,18 @@ class QuestionSetForm
     {
         return $schema
             ->components([
-                TextInput::make('subject_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('created_by')
-                    ->required()
-                    ->numeric(),
+                Select::make('subject_id')
+                    ->label('Subject')
+                    ->options(fn() => Subject::all()->pluck('name', 'id')->toArray())
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                Select::make('teacher_id')
+                    ->label('Teacher')
+                    ->options(fn() => User::all()->where('role', 'teacher')->pluck('name', 'id')->toArray())
+                    ->searchable()
+                    ->preload()
+                    ->required(),
                 TextInput::make('title')
                     ->required(),
                 TextInput::make('time_limit_minutes')
