@@ -1,4 +1,6 @@
 <x-frontend-layout>
-    <h1>this is home page</h1>
-    
+   <a href="{{route('student.dashboard')}}" class="bg-(--primary) py-2 px-3 ">
+    Dashboard
+   </a>
+
 </x-frontend-layout>
