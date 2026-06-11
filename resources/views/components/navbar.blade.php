@@ -4,9 +4,10 @@
         {{-- LOGO --}}
         <a href="{{ url('/') }}" class="os-logo">
             <div class="os-logo-mark">
-                <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M8 1L14 5V11L8 15L2 11V5L8 1Z"/>
-                    <path d="M8 1V15M2 5L14 11M14 5L2 11"/>
+                <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M8 1L14 5V11L8 15L2 11V5L8 1Z" />
+                    <path d="M8 1V15M2 5L14 11M14 5L2 11" />
                 </svg>
             </div>
             <span>Online<strong>Siksha</strong></span>
@@ -24,12 +25,14 @@
         {{-- CTA BUTTONS --}}
         <div class="os-nav-cta">
             @auth
-                @if(auth()->user()->role === 'admin')
+                @if (auth()->user()->role === 'admin')
                     <a href="/admin" class="os-btn-ghost">Admin Panel</a>
                 @elseif(auth()->user()->role === 'teacher')
-                    <a href="{{ route('teacher.dashboard') }}" class="os-btn-ghost">Dashboard</a>
+                    {{-- <a href="{{ route('teacher.dashboard') }}" class="os-btn-ghost">Dashboard</a> --}}
+                    <a href="#" class="os-btn-ghost">Dashboard</a>
                 @else
-                    <a href="{{ route('student.dashboard') }}" class="os-btn-ghost">Dashboard</a>
+                    {{-- <a href="{{ route('student.dashboard') }}" class="os-btn-ghost">Dashboard</a> --}}
+                    <a href="#" class="os-btn-ghost">Dashboard</a>
                 @endif
                 <form method="POST" action="{{ route('logout') }}" style="display:inline">
                     @csrf
@@ -61,8 +64,10 @@
             @auth
                 <a href="{{ route('logout') }}" class="os-btn-primary" style="width:100%;text-align:center">Log Out</a>
             @else
-                <a href="{{ route('login') }}" class="os-btn-ghost" style="width:100%;text-align:center;display:block;margin-bottom:8px">Log In</a>
-                <a href="{{ route('login') }}" class="os-btn-primary" style="width:100%;text-align:center;display:block">Get Started Free</a>
+                <a href="{{ route('login') }}" class="os-btn-ghost"
+                    style="width:100%;text-align:center;display:block;margin-bottom:8px">Log In</a>
+                <a href="{{ route('login') }}" class="os-btn-primary" style="width:100%;text-align:center;display:block">Get
+                    Started Free</a>
             @endauth
         </div>
     </div>

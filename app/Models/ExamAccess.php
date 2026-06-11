@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ExamAccess extends Model
 {
+    protected $table = 'exam_access';
     protected $fillable = [
         'class_id',
         'question_set_id',

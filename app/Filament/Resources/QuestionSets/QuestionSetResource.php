@@ -1,0 +1,64 @@
+<?php
+
+namespace App\Filament\Resources\QuestionSets;
+
+use App\Filament\Resources\QuestionSets\Pages\CreateQuestionSet;
+use App\Filament\Resources\QuestionSets\Pages\EditQuestionSet;
+use App\Filament\Resources\QuestionSets\Pages\ListQuestionSets;
+use App\Filament\Resources\QuestionSets\Schemas\QuestionSetForm;
+use App\Filament\Resources\QuestionSets\Tables\QuestionSetsTable;
+use App\Models\QuestionSet;
+use BackedEnum;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+class QuestionSetResource extends Resource
+{
+    protected static ?string $model = QuestionSet::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Exam Management';
+
+    protected static ?int $navigationSort = 2;
+
+    protected static ?string $recordTitleAttribute = 'title';
+
+    public static function form(Schema $schema): Schema
+    {
+        return QuestionSetForm::configure($schema);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return QuestionSetsTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            \App\Filament\Resources\QuestionSets\RelationManagers\QuestionsRelationManager::class,
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListQuestionSets::route('/'),
+            'create' => CreateQuestionSet::route('/create'),
+            'edit' => EditQuestionSet::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRecordRouteBindingEloquentQuery(): Builder
+    {
+        return parent::getRecordRouteBindingEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
+}
