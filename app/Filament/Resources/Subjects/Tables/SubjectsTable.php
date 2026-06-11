@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources\Subjects\Tables;
 
+use App\Models\User;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
@@ -17,8 +19,9 @@ class SubjectsTable
     {
         return $table
             ->columns([
-                TextColumn::make('created_by')
-                    ->numeric()
+                TextColumn::make('teacher.name')
+                    ->label('Teacher')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('name')
                     ->searchable(),
@@ -36,6 +39,10 @@ class SubjectsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('teacher_id')
+                    ->label('Teacher')
+                    ->options(fn() => User::all()->where('role', 'teacher')->pluck('name', 'id')->toArray())
+                    ->searchable(),
                 TrashedFilter::make(),
             ])
             ->recordActions([
