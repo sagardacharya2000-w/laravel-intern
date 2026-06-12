@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ExamAccess extends Model
 {
+    protected $table = 'exam_access';
+
     protected $fillable = [
         'class_id',
         'question_set_id',
@@ -29,6 +31,11 @@ class ExamAccess extends Model
     {
         return $this->belongsTo(QuestionSet::class);
     }
+
+    public function attempts()
+{
+    return $this->hasMany(Attempt::class, 'question_set_id', 'question_set_id');
+}
 
     // ─── Helpers ────────────────────────────────────────────────────────────────
 
