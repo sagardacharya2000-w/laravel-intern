@@ -16,7 +16,7 @@ class SubjectForm
             ->components([
                 Select::make('teacher_id')
                     ->label('Teacher')
-                    ->options(fn() => User::all()->where('role', 'teacher')->pluck('name', 'id')->toArray())
+                    ->options(fn() => User::where('role', 'teacher')->pluck('name', 'id')->toArray())
                     ->searchable()
                     ->preload()
                     ->required(),
