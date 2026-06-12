@@ -27,7 +27,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandName("EMS ADMIN")
+            ->brandName('Online Siksha')
             ->login()
             ->registration()
             ->colors([
@@ -40,8 +40,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
+               \App\Filament\Widgets\AdminStatsOverview::class,
+                \App\Filament\Widgets\RecentUsers::class,
             ])
             ->middleware([
                 EncryptCookies::class,
