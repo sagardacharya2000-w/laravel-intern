@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Filament\Resources\Subjects\Schemas;
+namespace App\Filament\Resources\SchoolClasses\Schemas;
 
-use App\Models\User;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
 
-class SubjectForm
+class SchoolClassForm
 {
     public static function configure(Schema $schema): Schema
     {
@@ -16,15 +14,18 @@ class SubjectForm
             ->components([
                 Select::make('teacher_id')
                     ->label('Teacher')
-                    ->options(fn() => User::where('role', 'teacher')->pluck('name', 'id')->toArray())
+                    ->relationship('teacher', 'name', fn ($query) => $query->where('role', 'teacher'))
                     ->searchable()
-                    ->preload()
                     ->required(),
                 TextInput::make('name')
                     ->required(),
-                Textarea::make('description')
-                    ->default(null)
-                    ->columnSpanFull(),
+                TextInput::make('grade_level')
+                    ->required(),
+                TextInput::make('academic_year')
+                    ->required(),
+                TextInput::make('class_code')
+                    ->required()
+                    ->unique(ignoreRecord: true),
             ]);
     }
 }
