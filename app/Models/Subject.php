@@ -10,7 +10,7 @@ class Subject extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'teacher_id',
+        'created_by',  
         'name',
         'description',
     ];
@@ -19,7 +19,7 @@ class Subject extends Model
 
     public function teacher()
     {
-        return $this->belongsTo(User::class, 'teacher_id')->withTrashed();
+        return $this->belongsTo(User::class, 'created_by')->withTrashed();
     }
 
     public function questionSets()
