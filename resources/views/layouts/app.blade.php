@@ -96,9 +96,19 @@
         <li><a href="#contact">Contact</a></li>
     </ul>
     <div class="nav-actions">
-        <a href="/admin" class="btn-nav-login">Sign in</a>
-        <a href="/admin" class="btn-nav-start">Get started</a>
-    </div>
+    @auth
+        <span style="font-size:14px;color:#64748b;font-weight:500;">
+            {{ auth()->user()->name }}
+        </span>
+        <form method="POST" action="{{ route('logout') }}" style="display:inline;">
+            @csrf
+            <button type="submit" class="btn-nav-login">Log Out</button>
+        </form>
+    @else
+        <a href="{{ route('login') }}" class="btn-nav-login">Sign in</a>
+        <a href="{{ route('login') }}" class="btn-nav-start">Get started</a>
+    @endauth
+</div>
     <button class="hamburger"><i class="ti ti-menu-2"></i></button>
 </nav>
 
