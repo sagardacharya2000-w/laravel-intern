@@ -63,7 +63,6 @@ class QuestionSetController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            // validation is KEPT REAL so we can test error messages in blade
             'title'                      => 'required|string|max:255',
             'subject_id'                 => 'required',
             'time_limit_minutes'         => 'required|integer|min:1',
@@ -81,7 +80,6 @@ class QuestionSetController extends Controller
             ->with('success', 'Question set created! (dummy — backend will save to DB)');
     }
 
-    // ────────────────────────────────────────────────────────────────────────────
     public function edit($questionSet)
     {
         $questionSet = (object)[
