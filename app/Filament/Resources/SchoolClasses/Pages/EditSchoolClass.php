@@ -12,6 +12,7 @@ class EditSchoolClass extends EditRecord
 {
     protected static string $resource = SchoolClassResource::class;
 
+
     protected function getHeaderActions(): array
     {
         return [
@@ -19,5 +20,9 @@ class EditSchoolClass extends EditRecord
             ForceDeleteAction::make(),
             RestoreAction::make(),
         ];
+    }
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 }

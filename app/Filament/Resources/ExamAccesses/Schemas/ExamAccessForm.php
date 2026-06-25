@@ -26,6 +26,11 @@ class ExamAccessForm
                     ->searchable()
                     ->preload()
                     ->required(),
+                   Select::make('assigned_by')
+                ->label('Assigned By')
+                ->default(auth()->id())
+               ->required()
+                ->disabled(),
                 DateTimePicker::make('scheduled_at')
                     ->label('Scheduled At')
                     ->required(),

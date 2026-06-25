@@ -21,7 +21,7 @@ class QuestionSetForm
                     ->searchable()
                     ->preload()
                     ->required(),
-                Select::make('teacher_id')
+                Select::make('created_by')
                     ->label('Teacher')
                     ->options(fn() => User::all()->where('role', 'teacher')->pluck('name', 'id')->toArray())
                     ->searchable()

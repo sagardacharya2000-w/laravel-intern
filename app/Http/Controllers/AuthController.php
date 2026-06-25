@@ -29,7 +29,7 @@ class AuthController extends Controller
             } elseif ($role === 'teacher') {
                 return redirect()->intended('/teacher/dashboard');
             } elseif ($role === 'student') {
-                return redirect()->intended('/student/dashboard');
+                return redirect()->intended('/student');
             }
 
             return redirect('/');
