@@ -11,6 +11,7 @@ class SubscriptionPlan extends Model
         'duration_days',
         'price',        // stored in PAISA (e.g. 100000 = Rs. 1,000) for Khalti compatibility
         'description',
+        'is_active',
     ];
 
     // ─── Relationships ───────────────────────────────────────────────────────────
