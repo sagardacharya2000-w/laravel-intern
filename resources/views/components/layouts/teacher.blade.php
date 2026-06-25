@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Teacher Panel — Online Siksha')</title>
+    <title>{{ $title ?? 'Teacher Panel — Online Siksha' }}</title>
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
     <style>
-        /* all the CSS from your original layout – keep it exactly as you had */
+
         * {
             box-sizing: border-box;
         }
@@ -265,122 +265,189 @@
             color: #6b7280;
         }
 
-.alert-success {
-    background: #ecfdf5;
-    color: #047857;
-    border: 1px solid #a7f3d0;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 14px;
-}
+        .alert-success {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
 
-.btn-primary {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #4338ca;
-    color: #fff;
-    border: none;
-    padding: 9px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-}
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #4338ca;
+            color: #fff;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
 
-.btn-primary:hover {
-    background: #3730a3;
-}
+        .btn-primary:hover {
+            background: #3730a3;
+        }
 
-.btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #f3f4f6;
-    color: #374151;
-    border: none;
-    padding: 9px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-}
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f3f4f6;
+            color: #374151;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
 
-.btn-secondary:hover {
-    background: #e5e7eb;
-}
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
 
-.action-link {
-    color: #4338ca;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 600;
-    margin-right: 12px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-}
+        .action-link {
+            color: #4338ca;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            margin-right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
 
-.action-link:hover {
-    text-decoration: underline;
-}
+        .action-link:hover {
+            text-decoration: underline;
+        }
 
-.action-danger {
-    color: #dc2626;
-}
+        .action-danger {
+            color: #dc2626;
+        }
 
-.form-group {
-    margin-bottom: 20px;
-}
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-.form-group label {
-    display: block;
-    font-size: 14px;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 6px;
-}
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+        }
 
-.form-input {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #1f2937;
-    font-family: inherit;
-}
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1f2937;
+            font-family: inherit;
+        }
 
-.form-input:focus {
-    outline: none;
-    border-color: #4338ca;
-    box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.1);
-}
+        .form-input:focus {
+            outline: none;
+            border-color: #4338ca;
+            box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.1);
+        }
 
-.form-error {
-    color: #dc2626;
-    font-size: 13px;
-    margin-top: 4px;
-}
+        .form-error {
+            color: #dc2626;
+            font-size: 13px;
+            margin-top: 4px;
+        }
 
-.form-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-    margin-top: 24px;
-}
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
 
-.panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 24px;
-    border-bottom: 1px solid #eef0f3;
-}
+        .user-menu {
+            position: relative;
+        }
+
+        .avatar {
+            cursor: pointer;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 260px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(0,0,0,.08);
+            display: none;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .user-email {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .dropdown-menu a,
+        .dropdown-menu button {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            background: none;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #111827;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .dropdown-menu a:hover,
+        .dropdown-menu button:hover {
+            background: #f9fafb;
+        }
+
+        .dropdown-menu button {
+            color: #dc2626;
+        }
 
         @media (max-width:900px) {
             .sidebar {
@@ -392,7 +459,9 @@
             }
         }
     </style>
-    @yield('styles')
+
+    {{-- per-page styles injected here --}}
+    {{ $styles ?? '' }}
 </head>
 
 <body>
@@ -400,34 +469,89 @@
         <aside class="sidebar">
             <div class="sidebar-logo">Online Siksha</div>
             <a href="{{ route('teacher.dashboard') }}"
-                class="nav-link {{ request()->routeIs('teacher.dashboard') ? 'active' : '' }}"><i
-                    class="ti ti-home"></i> Dashboard</a>
+                class="nav-link {{ request()->routeIs('teacher.dashboard') ? 'active' : '' }}">
+                <i class="ti ti-home"></i> Dashboard
+            </a>
 
             <div class="nav-section-label">Exam Management</div>
             <a href="{{ route('teacher.subjects.index') }}"
-                class="nav-link {{ request()->routeIs('teacher.subjects.*') ? 'active' : '' }}"><i
-                    class="ti ti-book-2"></i> Subjects</a>
+                class="nav-link {{ request()->routeIs('teacher.subjects.*') ? 'active' : '' }}">
+                <i class="ti ti-book-2"></i> Subjects
+            </a>
             <a href="{{ route('teacher.question-sets.index') }}"
-                class="nav-link {{ request()->routeIs('teacher.question-sets.*') ? 'active' : '' }}"><i
-                    class="ti ti-clipboard-list"></i> Question Sets</a>
+                class="nav-link {{ request()->routeIs('teacher.question-sets.*') ? 'active' : '' }}">
+                <i class="ti ti-clipboard-list"></i> Question Sets
+            </a>
             <a href="{{ route('teacher.exam-access.index') }}"
-                class="nav-link {{ request()->routeIs('teacher.exam-access.*') ? 'active' : '' }}"><i
-                    class="ti ti-calendar-event"></i> Exam Access</a>
+                class="nav-link {{ request()->routeIs('teacher.exam-access.*') ? 'active' : '' }}">
+                <i class="ti ti-calendar-event"></i> Exam Access
+            </a>
         </aside>
+
         <div class="main">
             <div class="topbar">
-                <div class="search-box"><i class="ti ti-search"></i><input type="text" placeholder="Search"></div>
-                <div class="avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
+                <div class="search-box">
+                    <i class="ti ti-search"></i>
+                    <input type="text" placeholder="Search">
+                </div>
+
+                <div class="user-menu">
+                    <div class="avatar" onclick="toggleMenu()">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    </div>
+
+                    <div class="dropdown-menu" id="userDropdown">
+                        <div class="user-info">
+                            <div class="user-details">
+                                <span class="user-name">{{ auth()->user()->name }}</span>
+                                <span class="user-email">{{ auth()->user()->email }}</span>
+                            </div>
+                        </div>
+
+                        <a href="">
+                            <i class="ti ti-user"></i>
+                            Account
+                        </a>
+
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit">
+                                <i class="ti ti-logout"></i>
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
+
             <div class="content">
-                <h1 class="page-title">@yield('page_title', 'Dashboard')</h1>
+                <h1 class="page-title">{{ $page_title ?? 'Dashboard' }}</h1>
+
                 @if (session('success'))
                     <div class="alert-success">{{ session('success') }}</div>
                 @endif
-                @yield('content')
+
+                {{-- page content goes here --}}
+                {{ $slot }}
             </div>
         </div>
     </div>
-</body>
 
+    {{-- per-page scripts injected here --}}
+    {{ $scripts ?? '' }}
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('userDropdown').classList.toggle('show');
+        }
+
+        document.addEventListener('click', function(e) {
+            const menu = document.querySelector('.user-menu');
+            if (!menu.contains(e.target)) {
+                document.getElementById('userDropdown').classList.remove('show');
+            }
+        });
+    </script>
+
+</body>
 </html>
