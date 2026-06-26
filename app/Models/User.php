@@ -48,6 +48,11 @@ class User extends Authenticatable
         return $this->role === 'student';
     }
 
+    public function isApprovedTeacher(): bool
+    {
+        return $this->role === 'teacher' && $this->is_active === true;
+    }
+
     // ─── Relationships ───────────────────────────────────────────────────────────
 
     /** Classes where this user is the assigned teacher */
