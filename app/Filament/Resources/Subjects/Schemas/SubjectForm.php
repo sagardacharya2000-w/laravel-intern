@@ -14,7 +14,7 @@ class SubjectForm
     {
         return $schema
             ->components([
-                Select::make('teacher_id')
+                Select::make('created_by')
                     ->label('Teacher')
                     ->options(fn() => User::where('role', 'teacher')->pluck('name', 'id')->toArray())
                     ->searchable()
