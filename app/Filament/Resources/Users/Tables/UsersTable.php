@@ -25,7 +25,7 @@ class UsersTable
                     }),
                 ToggleColumn::make('is_active')
                     ->label('Active')
-                    ->disabled(fn($record) => $record?->role !== 'teacher'),
+                    ->disabled(fn($record) => $record?->role === 'admin'),
                 TextColumn::make('created_at')->dateTime('d M Y')->label('Registered'),
             ])
             ->filters([
