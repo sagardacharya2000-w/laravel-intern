@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EnsureTeacherApproved
+class EnsureActive
 {
     /**
      * Handle an incoming request.
@@ -18,7 +18,7 @@ class EnsureTeacherApproved
         $user = $request->user();
 
         if ($user && $user->isTeacher() && !$user->is_active) {
-            abort(403, 'Your teacher account is pending approval.');
+            abort(403, 'Your account is deactivated.');
         }
 
         return $next($request);
