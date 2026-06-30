@@ -4,112 +4,427 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
+    <title>{{ $title ?? 'Student Panel — Online Siksha' }}</title>
+ 
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
 
     <style>
-        :root {
-            --blue: #1a56db;
-            --blue-dark: #1040b0;
-            --blue-light: #e8f0fe;
-            --blue-ll: #f0f5ff;
-            --text: #0a0f1e;
-            --muted: #5a6480;
-            --subtle: #8892a4;
-            --white: #ffffff;
-            --surface: #f7f9ff;
-            --border: #dde5f7;
-            --border-l: #eef2fb;
+        /* ── SAME CSS SYSTEM AS TEACHER LAYOUT ── */
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fb;
+            color: #1f2937;
         }
 
-        .nav {
+        .shell { display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 260px;
+            background: #fff;
+            border-right: 1px solid #eef0f3;
+            padding: 24px 16px;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            font-size: 20px;
+            font-weight: 800;
+            padding: 0 12px 24px;
+            color: #111827;
+        }
+
+        .nav-section-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            padding: 16px 12px 8px;
+        }
+
+        .nav-link {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 0 48px;
-            height: 64px;
-            border-bottom: 1px solid #e2e8f0;
-            position: sticky;
-            top: 0;
-            z-index: 999;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: #4b5563;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
         }
 
-        .nav-logo {
-            font-size: 22px;
-            font-weight: 700;
-            color: #fff;
+        .nav-link i { font-size: 18px; width: 20px; text-align: center; }
+        .nav-link:hover { background: #f3f4f6; color: #111827; }
+        .nav-link.active { background: #eef2ff; color: #4338ca; }
+
+        .main {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .topbar {
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 16px;
+            padding: 0 32px;
+            border-bottom: 1px solid #eef0f3;
+            background: #fff;
+        }
+
+        .search-box {
             display: flex;
             align-items: center;
             gap: 8px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 8px 14px;
+            color: #9ca3af;
+            font-size: 14px;
+            width: 280px;
         }
 
-        .nav-logo .dot {
-            color: #f59e0b;
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+            color: #1f2937;
+        }
+
+        .avatar {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            background: #111827;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .content { padding: 32px; flex: 1; }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #111827;
+            margin: 0 0 24px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border: 1px solid #eef0f3;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .stat-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 30px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .panel {
+            background: #fff;
+            border: 1px solid #eef0f3;
+            border-radius: 12px;
+            margin-bottom: 28px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            border-bottom: 1px solid #eef0f3;
+        }
+
+        .panel-header h3 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        table.data-table { width: 100%; border-collapse: collapse; }
+
+        table.data-table th {
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .03em;
+            color: #9ca3af;
+            font-weight: 600;
+            padding: 12px 24px;
+            border-bottom: 1px solid #eef0f3;
+        }
+
+        table.data-table td {
+            padding: 14px 24px;
+            font-size: 14px;
+            color: #1f2937;
+            border-bottom: 1px solid #f4f5f7;
+        }
+
+        table.data-table tr:last-child td { border-bottom: none; }
+
+        .empty-state {
+            padding: 40px 24px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 999px;
+        }
+
+        .badge-green { background: #ecfdf5; color: #047857; }
+        .badge-amber { background: #fffbeb; color: #b45309; }
+        .badge-gray  { background: #f3f4f6; color: #6b7280; }
+
+        .alert-success {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #4338ca;
+            color: #fff;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover { background: #3730a3; }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f3f4f6;
+            color: #374151;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover { background: #e5e7eb; }
+
+        .action-link {
+            color: #4338ca;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            margin-right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .action-link:hover { text-decoration: underline; }
+        .action-danger { color: #dc2626; }
+
+        .form-group { margin-bottom: 20px; }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1f2937;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4338ca;
+            box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.1);
+        }
+
+        .form-error { color: #dc2626; font-size: 13px; margin-top: 4px; }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+
+        .exam-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            padding: 24px;
+        }
+
+        .exam-card {
+            background: #f9fafb;
+            border: 1px solid #eef0f3;
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        .exam-card-subject {
+            font-size: 11px;
+            font-weight: 700;
+            color: #4338ca;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            margin-bottom: 6px;
+        }
+
+        .exam-card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 10px;
+        }
+
+        .exam-card-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 14px;
+        }
+
+        @media (max-width:900px) {
+            .sidebar { transform: translateX(-100%); }
+            .main { margin-left: 0; }
         }
     </style>
+
+    {{ $styles ?? '' }}
+
 </head>
 
-<body class="bg-(--surface) text-(--text)">
+<body>
+    <div class="shell">
+        <aside class="sidebar">
+            <div class="sidebar-logo">Online Siksha</div>
 
-    <div class="flex min-h-screen">
-
-        <!-- Sidebar -->
-        <aside class="w-64 bg-(--blue) text-white p-4 hidden md:flex flex-col sticky top-0 h-screen">
-
-            <div class="nav">
-                <div class="nav-logo">
-                 Online<span class="dot">Siksha</span>
-                </div>
-            </div>
-            <a href="{{ route('student.dashboard') }}" class="block px-3 py-2 rounded hover:bg-(--blue-dark)">
-                <i class="fa-solid fa-gauge"></i> Dashboard
+            <a href="{{ route('student.dashboard') }}"
+                class="nav-link {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">
+                <i class="ti ti-home"></i> Dashboard
             </a>
 
-            <a href="{{ route('student.courses') }}" class="block px-3 py-2 rounded hover:bg-(--blue-dark)">
-                <i class="fa-solid fa-book"></i></i> Courses
+            <div class="nav-section-label">My Learning</div>
+
+            <a href="{{ route('student.courses') }}"
+                class="nav-link {{ request()->routeIs('student.courses') ? 'active' : '' }}">
+                <i class="ti ti-key"></i> Enroll Class
             </a>
 
-            <a href="{{ route('student.exams') }}" class="block px-3 py-2 rounded hover:bg-(--blue-dark)">
-                <i class="fa-solid fa-file-pen"></i> Exams
+            <a href="{{ route('student.exams') }}"
+                class="nav-link {{ request()->routeIs('student.exams') ? 'active' : '' }}">
+                <i class="ti ti-file-text"></i> My Exams
             </a>
 
-            <a href="{{ route('student.result') }}" class="block px-3 py-2 rounded hover:bg-(--blue-dark)">
-                <i class="fa-solid fa-square-poll-vertical"></i> Results
+            <a href="{{ route('student.result') }}"
+                class="nav-link {{ request()->routeIs('student.result') ? 'active' : '' }}">
+                <i class="ti ti-chart-bar"></i> Attempt History
             </a>
 
-            <a href="{{ route('student.profile') }}" class="block px-3 py-2 rounded hover:bg-(--blue-dark)">
-                <i class="fa-solid fa-circle-user"></i> Profile
+            <div class="nav-section-label">Account</div>
+
+            <a href="{{ route('student.profile') }}"
+                class="nav-link {{ request()->routeIs('student.profile') ? 'active' : '' }}">
+                <i class="ti ti-user-circle"></i> Profile
             </a>
-
-            </nav>
-
         </aside>
 
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col">
+        <div class="main">
+            <div class="topbar">
+                <div class="search-box">
+                    <i class="ti ti-search"></i>
+                    <input type="text" placeholder="Search">
+                </div>
+                <div class="avatar">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                </div>
+            </div>
+            <div class="content">
+                <h1 class="page-title">{{ $pageTitle ?? 'Dashboard' }}</h1>
+                {{-- $pageTitle passed as named slot instead of @yield --}}
 
-            <header class="bg-white shadow px-6 py-4 flex justify-between sticky top-0">
-                <h1 class="text-xl font-semibold text-(--text)">
-                    Student Dashboard
-                </h1>
+                @if (session('success'))
+                    <div class="alert-success">{{ session('success') }}</div>
+                @endif
 
-                <button class="inline-block px-4 py-2 rounded bg-(--blue) text-white hover:bg-(--blue-dark)">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
-                </button>
-            </header>
-
-            <main class="flex-1 p-6 bg-(--surface)">
                 {{ $slot }}
-            </main>
 
+            </div>
         </div>
-
     </div>
+
+    {{ $scripts ?? '' }}
 
 </body>
 
