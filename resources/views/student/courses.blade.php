@@ -1,71 +1,64 @@
 <x-student>
+    <x-slot name="title">Enroll Class — Online Siksha</x-slot>
+    <x-slot name="pageTitle">Enroll Class</x-slot>
 
-<div class="space-y-8">
-
-<!-- Header -->
-<div>
-    <h1 class="text-3xl font-bold text-(--text)">My Classes & Subjects</h1>
-    <p class="text-sm text-(--muted)">
-        Enrolled classes and academic subjects
-    </p>
-</div>
-
-<!-- Class Cards -->
-<div class="grid md:grid-cols-3 gap-6">
-
-    <!-- Class 10 -->
-    <div class="bg-white p-5 rounded-lg shadow border border-(--border)">
-        <h2 class="text-xl font-bold">Class 10</h2>
-        <p class="text-sm text-(--muted)">Secondary Level</p>
-
-        <div class="mt-4 space-y-2 text-sm">
-            <p>📘 Mathematics</p>
-            <p>📗 Science</p>
-            <p>📙 English</p>
-            <p>📕 Computer</p>
+    {{-- Currently Enrolled Class --}}
+    <div class="panel" style="margin-bottom: 28px;">
+        <div class="panel-header">
+            <h3>My Enrolled Class</h3>
         </div>
-
-        <button class="mt-4 w-full py-2 bg-(--blue) text-white rounded">
-            View Subjects
-        </button>
+        <div style="padding: 24px;">
+            {{-- dummy data — backend will replace with real enrolled class --}}
+            <div style="display:flex;align-items:center;gap:16px;">
+                <div style="width:48px;height:48px;background:#eef2ff;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="ti ti-school" style="font-size:22px;color:#4338ca;"></i>
+                </div>
+                <div>
+                    <div style="font-size:16px;font-weight:700;color:#111827;">
+                        Grade 10 Section A
+                    </div>
+                    <div style="font-size:13px;color:#6b7280;margin-top:2px;">
+                        Class Code:
+                        <code style="background:#eef2ff;color:#4338ca;padding:2px 8px;border-radius:6px;font-size:13px;">
+                            G10A2026
+                        </code>
+                    </div>
+                </div>
+                <span class="badge badge-green" style="margin-left:auto;">Enrolled</span>
+            </div>
+        </div>
     </div>
 
-    <!-- Class 11 -->
-    <div class="bg-white p-5 rounded-lg shadow border border-(--border)">
-        <h2 class="text-xl font-bold">Class 11 (Science)</h2>
-        <p class="text-sm text-(--muted)">Higher Secondary</p>
-
-        <div class="mt-4 space-y-2 text-sm">
-            <p>📘 Physics</p>
-            <p>📗 Chemistry</p>
-            <p>📙 Mathematics</p>
-            <p>📕 Computer Science</p>
+    {{-- Enroll In A New Class --}}
+    <div class="panel">
+        <div class="panel-header">
+            <h3>Join a New Class</h3>
         </div>
-
-        <button class="mt-4 w-full py-2 bg-(--blue) text-white rounded">
-            View Subjects
-        </button>
-    </div>
-
-    <!-- Class 12 -->
-    <div class="bg-white p-5 rounded-lg shadow border border-(--border)">
-        <h2 class="text-xl font-bold">Class 12</h2>
-        <p class="text-sm text-(--muted)">Final Year</p>
-
-        <div class="mt-4 space-y-2 text-sm">
-            <p>📘 Physics</p>
-            <p>📗 Chemistry</p>
-            <p>📙 Mathematics</p>
-            <p>📕 English</p>
+        <div style="padding: 24px; max-width: 480px;">
+            <p style="font-size:14px;color:#6b7280;margin-bottom:20px;">
+                Enter the class code given by your teacher or admin to enroll.
+            </p>
+            <form method="POST" action="#">
+                @csrf
+                <div class="form-group">
+                    <label for="class_code">Class Code</label>
+                    <input
+                        type="text"
+                        name="class_code"
+                        id="class_code"
+                        class="form-input"
+                        placeholder="e.g. G10A2026"
+                        required
+                    >
+                    {{-- backend will validate: class exists, student not already enrolled --}}
+                </div>
+                <div class="form-actions" style="justify-content:flex-start;">
+                    <button type="submit" class="btn-primary">
+                        <i class="ti ti-key"></i> Enroll Now
+                    </button>
+                </div>
+            </form>
         </div>
-
-        <button class="mt-4 w-full py-2 bg-(--blue) text-white rounded">
-            View Subjects
-        </button>
     </div>
-
-</div>
-
-</div>
 
 </x-student>
