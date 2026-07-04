@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class ExamAccess extends Model
 {
     protected $table = 'exam_access';
+
     protected $fillable = [
         'class_id',
         'question_set_id',
+        'assigned_by',
         'scheduled_at',
         'expires_at',
     ];
@@ -19,7 +21,7 @@ class ExamAccess extends Model
         'expires_at'   => 'datetime',
     ];
 
-    // ─── Relationships ───────────────────────────────────────────────────────────
+    // ─── Relationships ─────────────────────────────────────
 
     public function schoolClass()
     {
@@ -31,7 +33,12 @@ class ExamAccess extends Model
         return $this->belongsTo(QuestionSet::class);
     }
 
-    // ─── Helpers ────────────────────────────────────────────────────────────────
+    public function assignedBy()
+    {
+        return $this->belongsTo(User::class, 'assigned_by');
+    }
+
+    // ─── Helpers ─────────────────────────────────────────
 
     /** Is the exam window currently open? */
     public function isActive(): bool

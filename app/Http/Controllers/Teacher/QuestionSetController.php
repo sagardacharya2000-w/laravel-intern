@@ -1,71 +1,40 @@
 <?php
 
 namespace App\Http\Controllers\Teacher;
-// this file belongs to the Teacher subfolder — must match folder structure
 
 use App\Http\Controllers\Controller;
-// base controller all controllers extend from
-
+use App\Models\QuestionSet;
+use App\Models\Subject;
 use Illuminate\Http\Request;
-// handles incoming form data for validation
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class QuestionSetController extends Controller
-// NOTE: no DB model imports needed — using dummy data only
-
 {
     public function index()
     {
-        $questionSets = collect([
-
-            (object)[
-                'id'                 => 1,
-                'title'              => 'Algebra Mid-term',
-                'subject'            => (object)['name' => 'Mathematics'],
-                'questions_count'    => 10,
-                'time_limit_minutes' => 30,
-                'is_randomized'      => true,
-                'attempts_count'     => 12,
-            ],
-            (object)[
-                'id'                 => 2,
-                'title'              => 'Science Chapter 5',
-                'subject'            => (object)['name' => 'Science'],
-                'questions_count'    => 8,
-                'time_limit_minutes' => 20,
-                'is_randomized'      => false,
-                'attempts_count'     => 5,
-            ],
-            (object)[
-                'id'                 => 3,
-                'title'              => 'English Grammar Quiz',
-                'subject'            => (object)['name' => 'English'],
-                'questions_count'    => 15,
-                'time_limit_minutes' => 45,
-                'is_randomized'      => true,
-                'attempts_count'     => 0,
-            ],
-        ]);
+        $questionSets = QuestionSet::where('created_by', auth()->id())
+            ->with('subject')
+            ->withCount(['questions', 'attempts'])
+            ->latest()
+            ->get();
 
         return view('teacher.question-sets.index', compact('questionSets'));
     }
 
     public function create()
     {
-        $subjects = collect([
-            (object)['id' => 1, 'name' => 'Mathematics'],
-            (object)['id' => 2, 'name' => 'Science'],
-            (object)['id' => 3, 'name' => 'English'],
-        ]);
+        $subjects = Subject::where('created_by', auth()->id())->get(['id', 'name']);
 
         return view('teacher.question-sets.create', compact('subjects'));
     }
 
-    public function store(Request $request)
+    protected function questionRules(): array
     {
-        $request->validate([
+        return [
             'title'                      => 'required|string|max:255',
-            'subject_id'                 => 'required',
             'time_limit_minutes'         => 'required|integer|min:1',
+            'is_randomized'              => 'sometimes|boolean',
             'questions'                  => 'required|array|min:1',
             'questions.*.prompt'         => 'required|string',
             'questions.*.option_a'       => 'required|string',
@@ -74,77 +43,88 @@ class QuestionSetController extends Controller
             'questions.*.option_d'       => 'required|string',
             'questions.*.correct_answer' => 'required|in:A,B,C,D',
             'questions.*.marks'          => 'required|integer|min:1',
-        ]);
-
-        return redirect()->route('teacher.question-sets.index')
-            ->with('success', 'Question set created! (dummy — backend will save to DB)');
+        ];
     }
 
-    public function edit($questionSet)
+    public function store(Request $request)
     {
-        $questionSet = (object)[
-            'id'                 => $questionSet,
-            'title'              => 'Algebra Mid-term',
-            'subject_id'         => 1,
-            'time_limit_minutes' => 30,
-            'is_randomized'      => true,
-        ];
+        $teacherId = auth()->id();
 
-        $subjects = collect([
-            (object)['id' => 1, 'name' => 'Mathematics'],
-            (object)['id' => 2, 'name' => 'Science'],
-            (object)['id' => 3, 'name' => 'English'],
-        ]);
+        $validated = $request->validate(array_merge($this->questionRules(), [
+            'subject_id' => ['required', Rule::exists('subjects', 'id')->where('created_by', $teacherId)],
+        ]));
 
-        $questions = collect([
-            (object)[
-                'prompt'         => 'What is 2 + 2?',
-                'option_a'       => '3',
-                'option_b'       => '4',
-                'option_c'       => '5',
-                'option_d'       => '6',
-                'correct_answer' => 'B',
-                'marks'          => 1,
-            ],
-            (object)[
-                'prompt'         => 'What is the square root of 16?',
-                'option_a'       => '2',
-                'option_b'       => '3',
-                'option_c'       => '4',
-                'option_d'       => '5',
-                'correct_answer' => 'C',
-                'marks'          => 2,
-            ],
-        ]);
+        DB::transaction(function () use ($validated, $teacherId) {
+            $questionSet = QuestionSet::create([
+                'created_by'         => $teacherId,
+                'subject_id'         => $validated['subject_id'],
+                'title'              => $validated['title'],
+                'time_limit_minutes' => $validated['time_limit_minutes'],
+                'is_randomized'      => $validated['is_randomized'] ?? false,
+            ]);
+
+            foreach ($validated['questions'] as $q) {
+                $questionSet->questions()->create($q);
+            }
+        });
+
+        return redirect()->route('teacher.question-sets.index')
+            ->with('success', 'Question set created successfully!');
+    }
+
+    public function edit(QuestionSet $questionSet)
+    {
+        abort_unless($questionSet->created_by === auth()->id(), 403);
+
+        $questionSet->load('questions');
+        $subjects = Subject::where('created_by', auth()->id())->get(['id', 'name']);
+        $questions = $questionSet->questions;
 
         return view('teacher.question-sets.edit', compact('questionSet', 'subjects', 'questions'));
     }
 
-    public function update(Request $request, $questionSet)
+    public function update(Request $request, QuestionSet $questionSet)
     {
-        $request->validate([
-            'title'                      => 'required|string|max:255',
-            'subject_id'                 => 'required',
-            'time_limit_minutes'         => 'required|integer|min:1',
-            'questions'                  => 'required|array|min:1',
-            'questions.*.prompt'         => 'required|string',
-            'questions.*.option_a'       => 'required|string',
-            'questions.*.option_b'       => 'required|string',
-            'questions.*.option_c'       => 'required|string',
-            'questions.*.option_d'       => 'required|string',
-            'questions.*.correct_answer' => 'required|in:A,B,C,D',
-            'questions.*.marks'          => 'required|integer|min:1',
-        ]);
+        $teacherId = auth()->id();
+        abort_unless($questionSet->created_by === $teacherId, 403);
+
+        $validated = $request->validate(array_merge($this->questionRules(), [
+            'subject_id' => ['required', Rule::exists('subjects', 'id')->where('created_by', $teacherId)],
+        ]));
+
+        DB::transaction(function () use ($questionSet, $validated) {
+            $questionSet->update([
+                'title'              => $validated['title'],
+                'subject_id'         => $validated['subject_id'],
+                'time_limit_minutes' => $validated['time_limit_minutes'],
+                'is_randomized'      => $validated['is_randomized'] ?? false,
+            ]);
+
+            // Simplest safe approach: replace all questions on edit
+            $questionSet->questions()->delete();
+
+            foreach ($validated['questions'] as $q) {
+                $questionSet->questions()->create($q);
+            }
+        });
 
         return redirect()->route('teacher.question-sets.index')
-            ->with('success', 'Question set updated! (dummy — backend will update DB)');
+            ->with('success', 'Question set updated successfully!');
     }
 
-
-    public function destroy($questionSet)
+    public function destroy(QuestionSet $questionSet)
     {
+        abort_unless($questionSet->created_by === auth()->id(), 403);
+
+        if ($questionSet->attempts()->exists()) {
+            return back()->withErrors([
+                'questionSet' => 'Cannot delete a question set that already has student attempts.',
+            ]);
+        }
+
+        $questionSet->delete();
 
         return redirect()->route('teacher.question-sets.index')
-            ->with('success', 'Question set deleted! (dummy — backend will delete from DB)');
+            ->with('success', 'Question set deleted successfully!');
     }
 }
