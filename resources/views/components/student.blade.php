@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Student Panel — Online Siksha' }}</title>
- 
+
 
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
@@ -392,12 +392,7 @@
                 <i class="ti ti-chart-bar"></i> Attempt History
             </a>
 
-            <div class="nav-section-label">Account</div>
-
-            <a href="{{ route('student.profile') }}"
-                class="nav-link {{ request()->routeIs('student.profile') ? 'active' : '' }}">
-                <i class="ti ti-user-circle"></i> Profile
-            </a>
+           
         </aside>
 
         <div class="main">
@@ -406,9 +401,53 @@
                     <i class="ti ti-search"></i>
                     <input type="text" placeholder="Search">
                 </div>
-                <div class="avatar">
-                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                </div>
+                <div style="position:relative;">
+    <div class="avatar" id="avatarBtn" onclick="toggleDropdown()"
+        style="cursor:pointer;">
+        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+    </div>
+    <div id="avatarDropdown" style="
+        display:none;
+        position:absolute;
+        right:0;
+        top:48px;
+        width:200px;
+        background:#fff;
+        border:1px solid #eef0f3;
+        border-radius:12px;
+        box-shadow:0 8px 24px rgba(0,0,0,0.08);
+        z-index:999;
+        overflow:hidden;
+    ">
+        <div style="padding:12px 16px;border-bottom:1px solid #eef0f3;">
+            <div style="font-size:13px;font-weight:700;color:#111827;">
+                {{ auth()->user()->name }}
+            </div>
+            <div style="font-size:12px;color:#9ca3af;margin-top:2px;">
+                {{ auth()->user()->email }}
+            </div>
+        </div>
+        <a href="{{ route('student.profile') }}"
+            style="display:flex;align-items:center;gap:10px;padding:11px 16px;
+                   font-size:13px;font-weight:500;color:#4b5563;text-decoration:none;">
+            <i class="ti ti-user-circle" style="font-size:16px;"></i>
+            My Account
+        </a>
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" style="
+                display:flex;align-items:center;gap:10px;
+                width:100%;padding:11px 16px;
+                font-size:13px;font-weight:500;color:#dc2626;
+                background:none;border:none;cursor:pointer;
+                border-top:1px solid #eef0f3;
+            ">
+                <i class="ti ti-logout" style="font-size:16px;"></i>
+                Log Out
+            </button>
+        </form>
+    </div>
+</div>
             </div>
             <div class="content">
                 <h1 class="page-title">{{ $pageTitle ?? 'Dashboard' }}</h1>
@@ -423,6 +462,20 @@
             </div>
         </div>
     </div>
+    <script>
+    function toggleDropdown() {
+        const d = document.getElementById('avatarDropdown');
+        d.style.display = d.style.display === 'none' ? 'block' : 'none';
+    }
+
+    document.addEventListener('click', function(e) {
+        const btn = document.getElementById('avatarBtn');
+        const dd  = document.getElementById('avatarDropdown');
+        if (!btn.contains(e.target) && !dd.contains(e.target)) {
+            dd.style.display = 'none';
+        }
+    });
+</script>
 
     {{ $scripts ?? '' }}
 
