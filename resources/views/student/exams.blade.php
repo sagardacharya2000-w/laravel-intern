@@ -1,78 +1,70 @@
 <x-student>
+    <x-slot name="title">My Exams — Online Siksha</x-slot>
+    <x-slot name="pageTitle">My Exams</x-slot>
 
-<div class="space-y-8">
-
-<!-- Header -->
-<div>
-    <h1 class="text-2xl font-bold text-(--text)">School Examinations</h1>
-    <p class="text-sm text-(--muted)">
-        MCQ-based exams for each class and subject
-    </p>
-</div>
-
-<!-- Exam List -->
-<div class="space-y-6">
-
-    <!-- Class 10 -->
-    <div class="bg-white p-5 rounded shadow border">
-        <h2 class="font-bold text-lg mb-3">Class 10 Exams</h2>
-
-        <div class="space-y-3">
-
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="font-medium">Mathematics MCQ Test</p>
-                    <p class="text-sm text-(--muted)">20 Questions • 30 Minutes</p>
-                </div>
-                <button class="px-3 py-1 bg-(--blue) text-white rounded">
-                    Start
-                </button>
-            </div>
-
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="font-medium">Science MCQ Test</p>
-                    <p class="text-sm text-(--muted)">25 Questions • 40 Minutes</p>
-                </div>
-                <button class="px-3 py-1 bg-(--blue) text-white rounded">
-                    Start
-                </button>
-            </div>
-
+    <div class="panel">
+        <div class="panel-header">
+            <h3>All Exams — Grade 10 Section A</h3>
+            {{-- dummy class name — backend will replace with real enrolled class --}}
         </div>
-    </div>
 
-    <!-- Class 11 -->
-    <div class="bg-white p-5 rounded shadow border">
-        <h2 class="font-bold text-lg mb-3">Class 11 Exams</h2>
-
-        <div class="space-y-3">
-
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="font-medium">Physics MCQ Test</p>
-                    <p class="text-sm text-(--muted)">30 Questions • 1 Hour</p>
-                </div>
-                <button class="px-3 py-1 bg-(--blue) text-white rounded">
-                    Start
-                </button>
+        @if($exams->isEmpty())
+            <div class="empty-state">
+                No exams assigned to your class yet.
             </div>
-
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="font-medium">Computer Science MCQ Test</p>
-                    <p class="text-sm text-(--muted)">20 Questions • 30 Minutes</p>
-                </div>
-                <button class="px-3 py-1 bg-(--blue) text-white rounded">
-                    Start
-                </button>
-            </div>
-
-        </div>
+        @else
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Exam Title</th>
+                        <th>Time Limit</th>
+                        <th>Marks</th>
+                        <th>Starts</th>
+                        <th>Expires</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($exams as $exam)
+                    <tr>
+                        <td>{{ $exam->subject }}</td>
+                        <td style="font-weight:600;">{{ $exam->title }}</td>
+                        <td>{{ $exam->time_limit_minutes }} min</td>
+                        <td>{{ $exam->total_marks }}</td>
+                        <td>{{ $exam->scheduled_at->format('d M, h:i A') }}</td>
+                        <td>{{ $exam->expires_at->format('d M, h:i A') }}</td>
+                        <td>
+                            @php
+                                $now      = now();
+                                $active   = $now->gte($exam->scheduled_at) && $now->lte($exam->expires_at);
+                                $upcoming = $now->lt($exam->scheduled_at);
+                                // manual status check — dummy objects don't have model methods
+                            @endphp
+                            @if($active)
+                                <span class="badge badge-green">Active</span>
+                            @elseif($upcoming)
+                                <span class="badge badge-amber">Upcoming</span>
+                            @else
+                                <span class="badge badge-gray">Expired</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($active)
+                                <a href="#" class="btn-primary" style="padding:6px 12px;font-size:13px;">
+                                    Start Exam
+                                </a>
+                                {{-- href="#" — backend will wire real exam URL --}}
+                            @else
+                                <span style="font-size:13px;color:#9ca3af;">—</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
     </div>
-
-</div>
-
-</div>
 
 </x-student>
