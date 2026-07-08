@@ -1,86 +1,77 @@
 <x-student>
+    <x-slot name="title">Attempt History — Online Siksha</x-slot>
+    <x-slot name="pageTitle">Attempt History</x-slot>
 
-<div class="space-y-6">
-
-<!-- Header -->
-<div>
-    <h1 class="text-2xl font-bold text-(--text)">Academic Results</h1>
-    <p class="text-sm text-(--muted)">
-        Performance in MCQ examinations
-    </p>
-</div>
-
-<!-- Summary -->
-<div class="grid md:grid-cols-3 gap-4">
-
-    <div class="bg-white p-5 rounded shadow">
-        <h3 class="text-sm text-(--muted)">Total Exams</h3>
-        <p class="text-2xl font-bold">8</p>
+    {{-- Summary Stat Cards --}}
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-label">
+                <i class="ti ti-clipboard-list"></i> Total Attempts
+            </div>
+            <div class="stat-value">{{ $attempts->count() }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">
+                <i class="ti ti-percentage"></i> Average Score
+            </div>
+            <div class="stat-value">
+                {{ $attempts->count() ? round($attempts->avg('percentage')) : 0 }}%
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">
+                <i class="ti ti-trophy"></i> Best Score
+            </div>
+            <div class="stat-value">
+                {{ $attempts->count() ? $attempts->max('percentage') : 0 }}%
+            </div>
+        </div>
     </div>
 
-    <div class="bg-white p-5 rounded shadow">
-        <h3 class="text-sm text-(--muted)">Average Score</h3>
-        <p class="text-2xl font-bold">78%</p>
+    {{-- Attempts Table --}}
+    <div class="panel">
+        <div class="panel-header">
+            <h3>All Attempts</h3>
+        </div>
+
+        @if($attempts->isEmpty())
+            <div class="empty-state">
+                No attempts yet. Once you take an exam, it will show here.
+            </div>
+        @else
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Exam Title</th>
+                        <th>Date Attempted</th>
+                        <th>Score</th>
+                        <th>Total Marks</th>
+                        <th>Percentage</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($attempts as $attempt)
+                    <tr>
+                        <td>{{ $attempt->subject }}</td>
+                        <td style="font-weight:600;">{{ $attempt->title }}</td>
+                        <td>{{ $attempt->submitted_at->format('d M Y, h:i A') }}</td>
+                        <td>{{ $attempt->score }}</td>
+                        <td>{{ $attempt->total_marks }}</td>
+                        <td>{{ $attempt->percentage }}%</td>
+                        <td>
+                            @if($attempt->percentage >= 40)
+                                <span class="badge badge-green">Pass</span>
+                            @else
+                                <span class="badge badge-gray">Fail</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
     </div>
-
-    <div class="bg-white p-5 rounded shadow">
-        <h3 class="text-sm text-(--muted)">Passed</h3>
-        <p class="text-2xl font-bold text-green-600">7</p>
-    </div>
-
-</div>
-
-<!-- Result Table -->
-<div class="bg-white rounded shadow overflow-hidden">
-
-    <table class="w-full">
-
-        <thead class="bg-gray-100">
-            <tr>
-                <th class="p-3 text-left">Class</th>
-                <th class="p-3 text-left">Subject</th>
-                <th class="p-3 text-left">Score</th>
-                <th class="p-3 text-left">Percentage</th>
-                <th class="p-3 text-left">Status</th>
-                <th class="p-3 text-left">Date</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-            <tr class="border-t">
-                <td class="p-3">Class 10</td>
-                <td class="p-3">Mathematics</td>
-                <td class="p-3">18 / 20</td>
-                <td class="p-3">90%</td>
-                <td class="p-3 text-green-600 font-semibold">Passed</td>
-                <td class="p-3">10 Jun 2026</td>
-            </tr>
-
-            <tr class="border-t">
-                <td class="p-3">Class 11</td>
-                <td class="p-3">Physics</td>
-                <td class="p-3">15 / 25</td>
-                <td class="p-3">60%</td>
-                <td class="p-3 text-yellow-600 font-semibold">Borderline</td>
-                <td class="p-3">12 Jun 2026</td>
-            </tr>
-
-            <tr class="border-t">
-                <td class="p-3">Class 10</td>
-                <td class="p-3">Science</td>
-                <td class="p-3">22 / 25</td>
-                <td class="p-3">88%</td>
-                <td class="p-3 text-green-600 font-semibold">Passed</td>
-                <td class="p-3">15 Jun 2026</td>
-            </tr>
-
-        </tbody>
-
-    </table>
-
-</div>
-
-</div>
 
 </x-student>

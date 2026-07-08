@@ -1,153 +1,102 @@
 <x-student>
 
-    <div class="space-y-6">
 
-        <!-- Welcome Section -->
-        <section>
-            <h1 class="text-2xl font-bold text-(--heading)">
-                Welcome Back 👋
-            </h1>
+    <x-slot name="title">Student Dashboard — Online Siksha</x-slot>
+    <x-slot name="pageTitle">Dashboard</x-slot>
 
-            <p class="text-(--muted) mt-1">
-                Stay updated with your exams and performance.
+
+    <div class="panel">
+        <div style="padding: 24px;">
+            <h3 style="margin:0 0 4px;font-size:18px;font-weight:700;color:#111827;">
+                Welcome back, {{ auth()->user()->name }} 👋
+            </h3>
+            <p style="margin:0;font-size:14px;color:#6b7280;">
+                {{ $enrolledClass->name ?? 'No class enrolled yet' }}
+                @if($enrolledClass)
+                    · Class Code: <strong style="color:#4338ca;">{{ $enrolledClass->class_code }}</strong>
+                @endif
             </p>
-        </section>
+        </div>
+    </div>
 
-        <!-- Statistics Cards -->
-        <section class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-label"><i class="ti ti-file-text"></i> Upcoming Exams</div>
+            <div class="stat-value">{{ $upcomingCount }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label"><i class="ti ti-circle-check"></i> Completed Exams</div>
+            <div class="stat-value">{{ $completedCount }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label"><i class="ti ti-percentage"></i> Average Score</div>
+            <div class="stat-value">{{ $averageScore }}%</div>
+        </div>
+    </div>
 
-            <article class="bg-white p-5 rounded-xl shadow">
-                <h3 class="font-semibold text-(--heading)">
-                    Upcoming Exams
-                </h3>
+    <div class="panel">
+        <div class="panel-header">
+            <h3>Available Exams</h3>
+        </div>
 
-                <p class="text-3xl font-bold mt-3">
-                    2
-                </p>
-
-                <p class="text-sm text-(--muted)">
-                    Scheduled exams
-                </p>
-            </article>
-
-            <article class="bg-white p-5 rounded-xl shadow">
-                <h3 class="font-semibold text-(--heading)">
-                    Completed Exams
-                </h3>
-
-                <p class="text-3xl font-bold mt-3">
-                    12
-                </p>
-
-                <p class="text-sm text-(--muted)">
-                    Exams taken
-                </p>
-            </article>
-
-            <article class="bg-white p-5 rounded-xl shadow">
-                <h3 class="font-semibold text-(--heading)">
-                    Average Score
-                </h3>
-
-                <p class="text-3xl font-bold mt-3">
-                    84%
-                </p>
-
-                <p class="text-sm text-(--muted)">
-                    Overall performance
-                </p>
-            </article>
-
-            <article class="bg-white p-5 rounded-xl shadow">
-                <h3 class="font-semibold text-(--heading)">
-                    Passed Exams
-                </h3>
-
-                <p class="text-3xl font-bold mt-3">
-                    11
-                </p>
-
-                <p class="text-sm text-(--muted)">
-                    Successful attempts
-                </p>
-            </article>
-
-        </section>
-
-        <!-- Upcoming Exams -->
-        <section class="bg-white p-5 rounded-xl shadow">
-
-            <h2 class="font-semibold text-lg text-(--heading) mb-4">
-                Upcoming Exams
-            </h2>
-
-            <div class="space-y-3">
-
-                <div class="flex justify-between items-center border-b pb-3">
-                    <div>
-                        <h3 class="font-medium">Physics MCQ Test</h3>
-                        <p class="text-sm text-(--muted)">
-                            Grade 12 Science
-                        </p>
+        @if($availableExams->isEmpty())
+            <div class="empty-state">No exams available right now. Check back later.</div>
+        @else
+            <div class="exam-card-grid">
+                @foreach($availableExams as $exam)
+                <div class="exam-card">
+                    <div class="exam-card-subject">{{ $exam->subject }}</div>
+                    <div class="exam-card-title">{{ $exam->title }}</div>
+                    <div class="exam-card-meta">
+                        <span><i class="ti ti-clock"></i> {{ $exam->time_limit_minutes }} min</span>
+                        <span><i class="ti ti-star"></i> {{ $exam->total_marks }} marks</span>
                     </div>
-
-                    <div class="grid">
-                        <button class="inline-block px-4 py-2 mt-6 rounded bg-(--primary) text-white hover:bg-(--primary-dark)">Register</button>
-                        <span class="text-sm text-(--muted)">
-                            15 Aug 2026
-                        </span>
-                    </div>
+                    @if($exam->is_active)
+                        <a href="#" class="btn-primary" style="width:100%;justify-content:center;">
+                            Start Exam
+                        </a>
+                    @else
+                        <span class="badge badge-amber">Opens {{ $exam->scheduled_at->format('d M, h:i A') }}</span>
+                    @endif
                 </div>
-
-                <div class="flex justify-between items-center border-b pb-3">
-                    <div>
-                        <h3 class="font-medium">Chemistry MCQ Test</h3>
-                        <p class="text-sm text-(--muted)">
-                            Grade 12 Science
-                        </p>
-                    </div>
-
-                    <div class="grid">
-                        <button class="inline-block px-4 py-2 mt-6 rounded bg-(--primary) text-white hover:bg-(--primary-dark)">Register</button>
-                        <span class="text-sm text-(--muted)">
-                            22 Aug 2026
-                        </span>
-                    </div>
-                </div>
-
+                @endforeach
             </div>
+        @endif
+    </div>
 
-        </section>
+    <div class="panel">
+        <div class="panel-header">
+            <h3>Attempt History</h3>
+        </div>
 
-        <!-- Recent Activity -->
-        <section class="bg-white p-5 rounded-xl shadow">
-
-            <h2 class="font-semibold text-lg text-(--heading) mb-4">
-                Recent Activity
-            </h2>
-
-            <ul class="space-y-3 text-(--text)">
-
-                <li>
-                    ✅ Completed Computer Science C Programming MCQ Test (95%)
-                </li>
-
-                <li>
-                    📊 Result published for Mathematics Algebra MCQ Test
-                </li>
-
-                <li>
-                    📝 Registered for Physics Heat and Temperature MCQ Test
-                </li>
-
-                <li>
-                    🎉 Scored highest marks in Chemistry Organic Chemistry MCQ Test
-                </li>
-
-            </ul>
-
-        </section>
-
+        @if($attemptHistory->isEmpty())
+            <div class="empty-state">No attempts yet. Once you take an exam, it'll show here.</div>
+        @else
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Exam Title</th>
+                        <th>Date Attempted</th>
+                        <th>Score</th>
+                        <th>Total Marks</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($attemptHistory as $attempt)
+                    <tr>
+                        <td>{{ $attempt->subject }}</td>
+                        <td>{{ $attempt->title }}</td>
+                        <td>{{ $attempt->date->format('d M Y') }}</td>
+                        <td>{{ $attempt->score }}</td>
+                        <td>{{ $attempt->total_marks }}</td>
+                        <td>{{ $attempt->percentage }}%</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
     </div>
 
 </x-student>
