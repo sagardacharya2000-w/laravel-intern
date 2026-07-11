@@ -1,88 +1,4 @@
-{{-- <x-layout>
-    <x-slot name="title">
-        Sign In
-    </x-slot>
-
-    <section class="min-h-[calc(100vh-4rem)] flex items-center justify-center px-8 py-16">
-
-        <div class="w-full max-w-[400px]">
-            <div class="text-center">
-                <span
-                    class="inline-flex items-center gap-1.5 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full mb-7">
-                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                    Exam Management System
-                </span>
-            </div>
-
-            <h1 class="text-2xl font-semibold tracking-tight text-slate-900 mb-2 text-center">
-                Sign in to your account
-            </h1>
-
-            <form method="POST" action="{{ route('login') }}" class="space-y-5">
-                @csrf
-
-                <div>
-                    <label for="username" class="block text-base font-medium text-slate-700 mb-1.5">
-                        Username
-                    </label>
-
-                    <input
-                        id="username"
-                        name="username"
-                        type="text"
-                        required
-                        autofocus
-                        value="{{ old('username') }}"
-                        class="w-full text-base px-4 py-2 text-slate-900 bg-white border border-slate-200 rounded-[10px] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-colors"
-                        placeholder="Enter your username"
-                    />
-
-                    @error('username')
-                        <p class="text-sm text-red-500 mt-1.5">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="password" class="block text-base font-medium text-slate-700 mb-1.5">
-                        Password
-                    </label>
-
-                    <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        required
-                        class="w-full text-base px-4 py-2 text-slate-900 bg-white border border-slate-200 rounded-[10px] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-colors"
-                        placeholder="Enter your password"
-                    />
-
-                    @error('password')
-                        <p class="text-sm text-red-500 mt-1.5">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                @if ($errors->any() && !$errors->has('username') && !$errors->has('password'))
-                    <p class="text-sm text-red-500">{{ $errors->first() }}</p>
-                @endif
-
-                <button
-                    type="submit"
-                    class="font-medium text-base w-full text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-[10px] transition-colors">
-                    Sign in
-                </button>
-
-            </form>
-
-            <p class="text-sm text-center text-slate-400 mt-8 leading-relaxed">
-                Don't have credentials? Contact your administrator.
-            </p>
-
-        </div>
-
-    </section>
- </x-layout>  --}}
-
- <x-layout>
+<x-layout>
     <x-slot name="title">
         Sign In — Online Siksha
     </x-slot>
@@ -245,35 +161,6 @@
     .os-login-right-top p {
         font-size: 0.875rem;
         color: var(--muted);
-    }
-
-    /* ROLE TABS */
-    .os-role-tabs {
-        display: flex;
-        gap: 6px;
-        background: var(--surface);
-        border-radius: 10px;
-        padding: 4px;
-        margin-bottom: 1.75rem;
-    }
-    .os-role-tab {
-        flex: 1;
-        padding: 0.5rem 0;
-        text-align: center;
-        font-size: 0.82rem;
-        font-weight: 600;
-        color: var(--muted);
-        border-radius: 7px;
-        cursor: pointer;
-        transition: all 0.15s;
-        border: none;
-        background: transparent;
-        font-family: 'DM Sans', sans-serif;
-    }
-    .os-role-tab.active {
-        background: var(--white);
-        color: var(--blue);
-        border: 1px solid var(--border);
     }
 
     /* FORM */
@@ -461,7 +348,7 @@
 
                 <div class="os-login-left-body">
                     <h2>Welcome<br>back to<br><em>Online Siksha.</em></h2>
-                    <p>Sign in to access your dashboard — exams, results, and everything your school needs.</p>
+                    <p>One login for everyone — admin, teacher, or student. Sign in and we'll take you straight to your dashboard.</p>
                     <ul class="os-login-features">
                         <li>
                             <div class="os-lf-icon"><i class="fa-solid fa-clock"></i></div>
@@ -494,19 +381,6 @@
                     <p>Enter your email and password to continue.</p>
                 </div>
 
-                {{-- ROLE TABS (visual only — role determined by credentials) --}}
-                <div class="os-role-tabs">
-                    <button class="os-role-tab active" onclick="setTab(this, 'admin')">
-                        <i class="fa-solid fa-user-shield"></i> Admin
-                    </button>
-                    <button class="os-role-tab" onclick="setTab(this, 'teacher')">
-                        <i class="fa-solid fa-chalkboard-teacher"></i> Teacher
-                    </button>
-                    <button class="os-role-tab" onclick="setTab(this, 'student')">
-                        <i class="fa-solid fa-user-graduate"></i> Student
-                    </button>
-                </div>
-
                 {{-- SESSION ERROR --}}
                 @if ($errors->any())
                     <div class="os-alert os-alert-error">
@@ -523,7 +397,7 @@
                     </div>
                 @endif
 
-                {{-- LOGIN FORM --}}
+                {{-- LOGIN FORM — single form, role is resolved server-side after auth --}}
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
 
@@ -611,15 +485,6 @@
             } else {
                 input.type = 'password';
                 icon.classList.replace('fa-eye-slash', 'fa-eye');
-            }
-        }
-
-        // Role tab switcher (visual only)
-        function setTab(el, role) {
-            document.querySelectorAll('.os-role-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            if (role == 'admin') {
-                window.location.herf ='/admin';
             }
         }
     </script>
