@@ -29,18 +29,46 @@
 
 /* ── HERO ── */
 .os-hero {
-    padding: 5rem 5% 0;
+    padding: 5.5rem 5% 4.5rem;
     background: linear-gradient(170deg, var(--blue-ll) 0%, var(--white) 55%);
     overflow: hidden;
+    position: relative;
+}
+.os-hero::before {
+    content: '';
+    position: absolute;
+    top: -180px; left: 50%;
+    transform: translateX(-50%);
+    width: 900px; height: 560px;
+    background: radial-gradient(circle, rgba(26,86,219,0.10) 0%, transparent 65%);
+    pointer-events: none;
+}
+.os-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(26,86,219,0.06) 1px, transparent 1px);
+    background-size: 22px 22px;
+    -webkit-mask-image: radial-gradient(ellipse 700px 420px at 50% 15%, #000 0%, transparent 75%);
+    mask-image: radial-gradient(ellipse 700px 420px at 50% 15%, #000 0%, transparent 75%);
+    pointer-events: none;
 }
 .os-hero-inner {
-    max-width: 1180px;
+    max-width: 720px;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 4rem;
-    align-items: center;
-    padding-bottom: 5rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+.os-hero-inner .os-hero-desc {
+    margin-left: auto;
+    margin-right: auto;
+}
+.os-hero-btns {
+    justify-content: center;
+}
+.os-trust {
+    justify-content: center;
 }
 .os-hero-pill {
     display: inline-flex;
@@ -131,93 +159,6 @@
 .os-trust-text { font-size: 0.8rem; color: var(--muted); line-height: 1.4; }
 .os-trust-text strong { color: var(--text); font-weight: 600; }
 
-/* HERO CARD */
-.os-hero-card {
-    background: #0b2d7a;
-    border-radius: 22px;
-    padding: 1.6rem;
-    position: relative;
-    overflow: hidden;
-}
-.os-card-dots {
-    position: absolute; inset: 0;
-    background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
-    background-size: 18px 18px;
-    pointer-events: none;
-}
-.os-card-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-    position: relative; z-index: 1;
-}
-.os-card-label { display: flex; align-items: center; gap: 8px; }
-.os-card-icon {
-    width: 34px; height: 34px;
-    background: rgba(255,255,255,0.08);
-    border-radius: 9px;
-    display: flex; align-items: center; justify-content: center;
-}
-.os-card-icon svg { width: 16px; height: 16px; stroke: #93c5fd; fill: none; stroke-width: 2; stroke-linecap: round; }
-.os-card-title { color: #fff; font-weight: 600; font-size: 0.9rem; }
-.os-card-subtitle { color: rgba(255,255,255,0.4); font-size: 0.72rem; margin-top: 1px; }
-.os-ebadge { padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.68rem; font-weight: 700; }
-.os-elive { background: rgba(5,150,105,0.2); color: #6ee7b7; border: 1px solid rgba(5,150,105,0.25); }
-.os-esoon { background: rgba(217,119,6,0.2); color: #fcd34d; border: 1px solid rgba(217,119,6,0.25); }
-.os-exam-row {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 11px;
-    padding: 0.875rem 1rem;
-    margin-bottom: 0.55rem;
-    display: flex; align-items: center; justify-content: space-between;
-    position: relative; z-index: 1;
-}
-.os-exam-name { color: #fff; font-size: 0.855rem; font-weight: 600; margin-bottom: 3px; }
-.os-exam-metas { display: flex; gap: 0.85rem; }
-.os-em { font-size: 0.7rem; color: rgba(255,255,255,0.38); }
-.os-timer-box {
-    background: rgba(26,86,219,0.3);
-    border: 1px solid rgba(59,130,246,0.35);
-    border-radius: 12px;
-    padding: 0.875rem 1rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.875rem;
-    position: relative; z-index: 1;
-    margin-bottom: 0.6rem;
-}
-.os-t-label { color: rgba(255,255,255,0.45); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 3px; }
-.os-t-digits { font-family: 'Sora', sans-serif; color: #fff; font-weight: 800; font-size: 1.6rem; letter-spacing: 2.5px; }
-.os-t-bar { background: rgba(255,255,255,0.08); border-radius: 999px; height: 3px; margin-top: 7px; overflow: hidden; }
-.os-t-fill { background: #3b82f6; height: 100%; width: 68%; transition: width 1s linear; border-radius: 999px; }
-.os-t-right { border-left: 1px solid rgba(255,255,255,0.07); padding-left: 0.875rem; }
-.os-q-num { font-family: 'Sora', sans-serif; color: #fff; font-weight: 800; font-size: 1.6rem; }
-.os-q-num span { font-size: 0.9rem; opacity: 0.35; font-weight: 400; }
-.os-score-bar {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 11px;
-    padding: 0.75rem 1rem;
-    display: flex; align-items: center; justify-content: space-between;
-    position: relative; z-index: 1;
-}
-.os-score-label { font-size: 0.75rem; color: rgba(255,255,255,0.45); }
-.os-score-value { font-family: 'Sora', sans-serif; color: #6ee7b7; font-weight: 700; font-size: 0.9rem; }
-
-/* ── STRIP ── */
-.os-strip {
-    background: var(--surface);
-    border-top: 1px solid var(--border-l);
-    border-bottom: 1px solid var(--border-l);
-    padding: 1.1rem 5%;
-    display: flex; align-items: center; justify-content: center;
-    gap: 1.5rem; flex-wrap: wrap;
-}
-.os-strip-label { font-size: 0.75rem; color: var(--subtle); font-weight: 500; }
-.os-chip { padding: 0.3rem 0.875rem; background: var(--white); border: 1px solid var(--border); border-radius: 7px; font-size: 0.78rem; font-weight: 600; color: var(--muted); }
-
 /* ── STATS ── */
 .os-stats {
     padding: 3.5rem 5%;
@@ -234,7 +175,7 @@
     border-radius: 15px;
     transition: all 0.2s;
 }
-.os-stat:hover { border-color: var(--border); }
+.os-stat:hover { border-color: var(--border); box-shadow: 0 8px 24px rgba(26,86,219,0.06); transform: translateY(-2px); }
 .os-stat-num { font-family: 'Sora', sans-serif; font-size: 2rem; font-weight: 900; color: var(--blue); letter-spacing: -1px; }
 .os-stat-desc { font-size: 0.8rem; color: var(--muted); margin-top: 3px; font-weight: 500; }
 
@@ -266,7 +207,7 @@
     border-radius: 16px 16px 0 0;
     opacity: 0; transition: opacity 0.2s;
 }
-.os-fc:hover { border-color: var(--border); transform: translateY(-2px); }
+.os-fc:hover { border-color: var(--border); transform: translateY(-2px); box-shadow: 0 12px 28px rgba(26,86,219,0.07); }
 .os-fc:hover::after { opacity: 1; }
 .os-fi {
     width: 46px; height: 46px;
@@ -300,7 +241,8 @@
 
 /* ── ROLES ── */
 .os-roles-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.1rem; margin-top: 3.25rem; }
-.os-rc { border-radius: 18px; padding: 1.875rem; overflow: hidden; }
+.os-rc { border-radius: 18px; padding: 1.875rem; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+.os-rc:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(11,45,122,0.1); }
 .os-rc-admin { background: #0b2d7a; }
 .os-rc-teacher { background: var(--blue-light); border: 1px solid var(--border); }
 .os-rc-student { background: #ecfdf5; border: 1px solid #a7f3d0; }
@@ -333,7 +275,7 @@
 /* ── TESTIMONIALS ── */
 .os-test-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.1rem; margin-top: 3.25rem; }
 .os-tc { background: var(--white); border: 1px solid var(--border-l); border-radius: 16px; padding: 1.5rem; transition: all 0.2s; }
-.os-tc:hover { border-color: var(--border); }
+.os-tc:hover { border-color: var(--border); box-shadow: 0 12px 28px rgba(26,86,219,0.06); transform: translateY(-2px); }
 .os-stars { display: flex; gap: 3px; margin-bottom: 1rem; }
 .os-star { width: 14px; height: 14px; background: var(--blue); clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); opacity: 0.85; }
 .os-tc p { font-size: 0.875rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.25rem; font-style: italic; }
@@ -347,7 +289,8 @@
 
 /* ── PRICING ── */
 .os-pr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; max-width: 760px; margin: 3.25rem auto 0; }
-.os-pc { background: var(--white); border: 1px solid var(--border); border-radius: 18px; padding: 1.875rem; position: relative; }
+.os-pc { background: var(--white); border: 1px solid var(--border); border-radius: 18px; padding: 1.875rem; position: relative; transition: all 0.2s; }
+.os-pc:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(26,86,219,0.07); }
 .os-pc.best { border-color: var(--blue); border-width: 2px; background: var(--blue-ll); }
 .os-pc-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--blue); color: #fff; font-size: 0.68rem; font-weight: 700; padding: 0.22rem 0.875rem; border-radius: 999px; white-space: nowrap; font-family: 'Sora', sans-serif; }
 .os-pc-name { font-family: 'Sora', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; }
@@ -397,7 +340,6 @@
 
 /* ── RESPONSIVE ── */
 @media (max-width: 992px) {
-    .os-hero-inner { grid-template-columns: 1fr; gap: 3rem; }
     .os-hero h1 { font-size: 2.6rem; }
     .os-feat-grid { grid-template-columns: repeat(2,1fr); }
     .os-roles-grid { grid-template-columns: 1fr; gap: 1rem; }
@@ -417,14 +359,7 @@
 </style>
 </x-slot>
 
-{{-- ═══════════════════════════════════════ --}}
-{{-- ANNOUNCEMENT BAR                       --}}
-{{-- ═══════════════════════════════════════ --}}
-<div class="os-announce">
-    <span class="os-ann-badge">NEW</span>
-    <span class="os-ann-text">Online Siksha is now live for Nepali schools — Academic Year 2082-83</span>
-    <a href="#" class="os-ann-link">Learn more →</a>
-</div>
+
 
 {{-- ═══════════════════════════════════════ --}}
 {{-- HERO                                   --}}
@@ -438,7 +373,7 @@
                 <span class="os-pill-dot"></span>
                 Built for Nepali schools · 2082-83
             </div>
-            <h1>Exams made<br><em>smarter</em> for<br>every school.</h1>
+            <h1>Exams made <em>smarter</em><br>for every school.</h1>
             <p class="os-hero-desc">
                 Online Siksha brings your entire exam workflow online — question sets,
                 timed delivery, auto-grading, and instant results — all in one platform.
@@ -466,74 +401,10 @@
             </div>
         </div>
 
-        {{-- RIGHT: LIVE EXAM CARD --}}
-        <div class="os-hero-card">
-            <div class="os-card-dots"></div>
-            <div class="os-card-top">
-                <div class="os-card-label">
-                    <div class="os-card-icon">
-                        <svg viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="12" rx="2"/><path d="M5 7h6M5 10h4"/></svg>
-                    </div>
-                    <div>
-                        <div class="os-card-title">Active exams</div>
-                        <div class="os-card-subtitle">Grade 9 &amp; 10 · 2082</div>
-                    </div>
-                </div>
-                <span class="os-ebadge os-elive">● 2 live</span>
-            </div>
-            <div class="os-exam-row">
-                <div>
-                    <div class="os-exam-name">Mathematics — Grade 10</div>
-                    <div class="os-exam-metas">
-                        <span class="os-em">⏱ 45 min</span>
-                        <span class="os-em">📋 30 Qs</span>
-                        <span class="os-em">⭐ 100 marks</span>
-                    </div>
-                </div>
-                <span class="os-ebadge os-elive">Live</span>
-            </div>
-            <div class="os-exam-row">
-                <div>
-                    <div class="os-exam-name">Science — Grade 9</div>
-                    <div class="os-exam-metas">
-                        <span class="os-em">⏱ 60 min</span>
-                        <span class="os-em">📋 40 Qs</span>
-                        <span class="os-em">⭐ 80 marks</span>
-                    </div>
-                </div>
-                <span class="os-ebadge os-esoon">Soon</span>
-            </div>
-            <div class="os-timer-box">
-                <div>
-                    <div class="os-t-label">Time remaining</div>
-                    <div class="os-t-digits" id="osTimer">32:47</div>
-                    <div class="os-t-bar"><div class="os-t-fill" id="osTimerFill"></div></div>
-                </div>
-                <div class="os-t-right">
-                    <div class="os-t-label">Answered</div>
-                    <div class="os-q-num" id="osQNum">18<span>/30</span></div>
-                </div>
-            </div>
-            <div class="os-score-bar">
-                <span class="os-score-label">Last attempt · Mathematics Grade 10</span>
-                <span class="os-score-value">85 / 100 · 85%</span>
-            </div>
-        </div>
-
     </div>
 </section>
 
-{{-- ═══════════════════════════════════════ --}}
-{{-- TECH STRIP                             --}}
-{{-- ═══════════════════════════════════════ --}}
-<div class="os-strip">
-    <span class="os-strip-label">Powered by</span>
-    <span class="os-chip">Laravel 12</span>
-    <span class="os-chip">Filament v5</span>
-    <span class="os-chip">MySQL 8</span>
-    <span class="os-chip">Bootstrap 5</span>
-    <span class="os-chip">Khalti Pay</span>
-</div>
+
 
 {{-- ═══════════════════════════════════════ --}}
 {{-- STATS                                  --}}
@@ -842,18 +713,6 @@
 
 <x-slot name="scripts">
 <script>
-    // Live timer on hero card
-    let s = 32 * 60 + 47, total = 45 * 60;
-    setInterval(() => {
-        if (s <= 0) return;
-        s--;
-        const m = Math.floor(s / 60), sec = s % 60;
-        document.getElementById('osTimer').textContent = m + ':' + (sec < 10 ? '0' : '') + sec;
-        document.getElementById('osTimerFill').style.width = Math.round((s / total) * 100) + '%';
-        const a = Math.min(18 + Math.floor((total - s) / 90), 30);
-        document.getElementById('osQNum').innerHTML = a + '<span>/30</span>';
-    }, 1000);
-
     // FAQ accordion
     function osFaq(el) {
         const item = el.parentElement;
