@@ -39,8 +39,7 @@
                     <button type="submit" class="os-btn-primary">Log Out</button>
                 </form>
             @else
-                <a href="{{ route('login') }}" class="os-btn-ghost">Log In</a>
-                <a href="{{ route('login') }}" class="os-btn-primary">Get Started Free</a>
+                <a href="{{ route('login') }}" class="os-btn-primary">Log In</a>
             @endauth
         </div>
 
@@ -64,10 +63,8 @@
             @auth
                 <a href="{{ route('logout') }}" class="os-btn-primary" style="width:100%;text-align:center">Log Out</a>
             @else
-                <a href="{{ route('login') }}" class="os-btn-ghost"
-                    style="width:100%;text-align:center;display:block;margin-bottom:8px">Log In</a>
-                <a href="{{ route('login') }}" class="os-btn-primary" style="width:100%;text-align:center;display:block">Get
-                    Started Free</a>
+                <a href="{{ route('login') }}" class="os-btn-primary"
+                    style="width:100%;text-align:center;display:block">Log In</a>
             @endauth
         </div>
     </div>
