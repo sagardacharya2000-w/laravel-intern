@@ -21,6 +21,10 @@ Route::middleware(['auth', 'role:teacher', 'isActive'])->group(function () {
     Route::get('/teacher/dashboard', [TeacherDashboardController::class, 'index'])
         ->name('teacher.dashboard');
 
+    Route::get('/teacher/profile', function () {
+        return view('teacher.profile');
+    })->name('teacher.profile');
+
     Route::prefix('teacher/subjects')->name('teacher.subjects.')->group(function () {
         Route::get('/', [SubjectController::class, 'index'])->name('index');
         Route::get('/create', [SubjectController::class, 'create'])->name('create');
