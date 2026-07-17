@@ -85,4 +85,4 @@
         </div>
     </div>
 
-</x-layout>
+</x-layouts.teacher>
