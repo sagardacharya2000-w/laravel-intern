@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('subscription_plans', function (Blueprint $table) {
             $table->id();
             $table->string('name');                          // e.g. Monthly, Yearly
-            $table->enum('period', ['monthly', 'yearly']);
-            $table->unsignedInteger('price');                // in paisa (NPR × 100) for Khalti
+            $table->unsignedInteger('duration_days');        // Matches your model perfectly
+            $table->unsignedInteger('price');                // In paisa (NPR × 100) for Khalti
             $table->text('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();

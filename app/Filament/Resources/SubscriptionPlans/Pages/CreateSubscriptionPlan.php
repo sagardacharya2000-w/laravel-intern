@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\SubscriptionPlans\Pages;
+namespace App\Filament\Resources\SubscriptionPlanResource\Pages;
 
-use App\Filament\Resources\SubscriptionPlans\SubscriptionPlanResource;
+use App\Filament\Resources\SubscriptionPlanResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateSubscriptionPlan extends CreateRecord

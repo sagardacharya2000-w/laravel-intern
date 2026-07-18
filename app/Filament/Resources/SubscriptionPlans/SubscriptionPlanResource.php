@@ -1,48 +1,96 @@
 <?php
 
-namespace App\Filament\Resources\SubscriptionPlans;
+namespace App\Filament\Resources;
 
-use App\Filament\Resources\SubscriptionPlans\Pages\CreateSubscriptionPlan;
-use App\Filament\Resources\SubscriptionPlans\Pages\EditSubscriptionPlan;
-use App\Filament\Resources\SubscriptionPlans\Pages\ListSubscriptionPlans;
-use App\Filament\Resources\SubscriptionPlans\Schemas\SubscriptionPlanForm;
-use App\Filament\Resources\SubscriptionPlans\Tables\SubscriptionPlansTable;
 use App\Models\SubscriptionPlan;
-use BackedEnum;
+use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
+use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Resources\Pages\ListRecords;
+use Filament\Resources\Pages\CreateRecord;
+use Filament\Resources\Pages\EditRecord;
+use Filament\Actions;
 
 class SubscriptionPlanResource extends Resource
 {
     protected static ?string $model = SubscriptionPlan::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
 
-    public static function form(Schema $schema): Schema
+    protected static ?string $navigationGroup = 'Subscription Management';
+
+    public static function form(Form $form): Form
     {
-        return SubscriptionPlanForm::configure($schema);
+        return $form
+            ->schema([
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('duration_days')
+                    ->numeric()
+                    ->label('Duration (Days)')
+                    ->required(),
+                Forms\Components\TextInput::make('price')
+                    ->numeric()
+                    ->label('Price (Paisa)')
+                    ->required(),
+                Forms\Components\Textarea::make('description')
+                    ->maxLength(65535)
+                    ->columnSpanFull(),
+                Forms\Components\Toggle::make('is_active')
+                    ->label('Active Status')
+                    ->default(true),
+            ]);
     }
 
     public static function table(Table $table): Table
     {
-        return SubscriptionPlansTable::configure($table);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('duration_days')->label('Duration (Days)')->sortable(),
+                Tables\Columns\TextColumn::make('price')->label('Price (Paisa)')->sortable(),
+                Tables\Columns\IconColumn::make('is_active')->boolean()->label('Active'),
+                Tables\Columns\TextColumn::make('created_at')->dateTime()->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ListSubscriptionPlans::route('/'),
-            'create' => CreateSubscriptionPlan::route('/create'),
-            'edit' => EditSubscriptionPlan::route('/{record}/edit'),
+            'index' => SubscriptionPlanResource\Pages\InlineListSubscriptionPlans::route('/'),
+            'create' => SubscriptionPlanResource\Pages\InlineCreateSubscriptionPlan::route('/create'),
+            'edit' => SubscriptionPlanResource\Pages\InlineEditSubscriptionPlan::route('/{record}/edit'),
         ];
     }
+}
+
+namespace App\Filament\Resources\SubscriptionPlanResource\Pages;
+
+class InlineListSubscriptionPlans extends ListRecords
+{
+    protected static string $resource = \App\Filament\Resources\SubscriptionPlanResource::class;
+    protected function getHeaderActions(): array { return [Actions\CreateAction::make()]; }
+}
+
+class InlineCreateSubscriptionPlan extends CreateRecord
+{
+    protected static string $resource = \App\Filament\Resources\SubscriptionPlanResource::class;
+}
+
+class InlineEditSubscriptionPlan extends EditRecord
+{
+    protected static string $resource = \App\Filament\Resources\SubscriptionPlanResource::class;
+    protected function getHeaderActions(): array { return [Actions\DeleteAction::make()]; }
 }

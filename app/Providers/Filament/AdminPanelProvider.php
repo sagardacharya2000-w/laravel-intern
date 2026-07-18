@@ -36,6 +36,9 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Dashboard::class,
             ])
+            ->resources([
+                \App\Filament\Resources\SubscriptionPlanResource::class, // 👈 Explicitly registering your fixed singular resource bypasses any folder cache completely!
+            ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 \App\Filament\Widgets\AdminStatsOverview::class,
