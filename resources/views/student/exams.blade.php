@@ -4,8 +4,7 @@
 
     <div class="panel">
         <div class="panel-header">
-            <h3>All Exams — Grade 10 Section A</h3>
-            {{-- dummy class name — backend will replace with real enrolled class --}}
+            <h3>All Exams</h3>
         </div>
 
         @if($exams->isEmpty())
@@ -40,7 +39,6 @@
                                 $now      = now();
                                 $active   = $now->gte($exam->scheduled_at) && $now->lte($exam->expires_at);
                                 $upcoming = $now->lt($exam->scheduled_at);
-                                // manual status check — dummy objects don't have model methods
                             @endphp
                             @if($active)
                                 <span class="badge badge-green">Active</span>
@@ -52,10 +50,10 @@
                         </td>
                         <td>
                             @if($active)
-                                <a href="#" class="btn-primary" style="padding:6px 12px;font-size:13px;">
+                                <a href="{{ route('student.exam-taking', $exam->id) }}"
+                                    class="btn-primary" style="padding:6px 12px;font-size:13px;">
                                     Start Exam
                                 </a>
-                                {{-- href="#" — backend will wire real exam URL --}}
                             @else
                                 <span style="font-size:13px;color:#9ca3af;">—</span>
                             @endif

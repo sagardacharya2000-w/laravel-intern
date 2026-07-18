@@ -508,7 +508,7 @@
                             </div>
                         </div>
 
-                        <a href="">
+                        <a href="{{ route('teacher.profile') }}">
                             <i class="ti ti-user"></i>
                             Account
                         </a>

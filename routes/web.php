@@ -21,6 +21,10 @@ Route::middleware(['auth', 'role:teacher', 'isActive'])->group(function () {
     Route::get('/teacher/dashboard', [TeacherDashboardController::class, 'index'])
         ->name('teacher.dashboard');
 
+    Route::get('/teacher/profile', function () {
+        return view('teacher.profile');
+    })->name('teacher.profile');
+
     Route::prefix('teacher/subjects')->name('teacher.subjects.')->group(function () {
         Route::get('/', [SubjectController::class, 'index'])->name('index');
         Route::get('/create', [SubjectController::class, 'create'])->name('create');
@@ -56,4 +60,10 @@ Route::middleware(['auth', 'role:student', 'isActive'])->group(function () {
     Route::get('/student/exams', [StudentController::class, 'exams'])->name('student.exams');
     Route::get('/student/results', [StudentController::class, 'result'])->name('student.result');
     Route::get('/student/profile', [StudentController::class, 'profile'])->name('student.profile');
+
+    // Exam taking — new
+    Route::get('/student/exam-taking/{examAccess}', [StudentController::class, 'examTaking'])
+        ->name('student.exam-taking');
+    Route::post('/student/exam-taking/{examAccess}/submit', [StudentController::class, 'submitExam'])
+        ->name('student.exam-taking.submit');
 });

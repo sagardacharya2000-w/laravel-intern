@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\ExamAccess;
+use App\Models\Attempt;
+use App\Models\AttemptAnswer;
+use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
@@ -24,6 +27,7 @@ class StudentController extends Controller
             ->filter(fn($ea) => ! $ea->isExpired())
             ->sortBy('scheduled_at')
             ->map(fn($ea) => (object) [
+                'exam_access_id'     => $ea->id,
                 'question_set_id'    => $ea->question_set_id,
                 'subject'            => $ea->questionSet->subject->name ?? '—',
                 'title'              => $ea->questionSet->title,
@@ -115,5 +119,86 @@ class StudentController extends Controller
     public function profile()
     {
         return view('student.profile');
+    }
+
+    // ── EXAM TAKING ──────────────────────────────────────────────────────────
+
+    public function examTaking(ExamAccess $examAccess)
+    {
+        $student = auth()->user();
+
+        $enrolledClassIds = $student->enrolledClasses()->pluck('classes.id');
+        abort_unless($enrolledClassIds->contains($examAccess->class_id), 403);
+
+        abort_unless($examAccess->isActive(), 403, 'This exam is not currently available.');
+
+        $questionSet = $examAccess->questionSet;
+        $questions   = $questionSet->questions;
+
+        if ($questionSet->is_randomized) {
+            $questions = $questions->shuffle();
+        }
+
+        $attempt = Attempt::firstOrCreate(
+            [
+                'student_id'      => $student->id,
+                'question_set_id' => $questionSet->id,
+                'status'          => 'in_progress',
+            ],
+            [
+                'total_marks' => $questions->sum('marks'),
+                'started_at'  => now(),
+            ]
+        );
+
+        $exam = (object) [
+            'exam_access_id'     => $examAccess->id,
+            'title'              => $questionSet->title,
+            'subject'            => $questionSet->subject->name ?? '—',
+            'time_limit_minutes' => $questionSet->time_limit_minutes,
+            'total_marks'        => $questions->sum('marks'),
+        ];
+
+        return view('student.exam-taking', compact('exam', 'questions', 'attempt'));
+    }
+
+    public function submitExam(Request $request, ExamAccess $examAccess)
+    {
+        $student = auth()->user();
+
+        $attempt = Attempt::where('student_id', $student->id)
+            ->where('question_set_id', $examAccess->question_set_id)
+            ->where('status', 'in_progress')
+            ->latest('started_at')
+            ->firstOrFail();
+
+        $answers = $request->input('answers', []);
+        $score   = 0;
+
+        foreach ($examAccess->questionSet->questions as $question) {
+            $selected      = $answers[$question->id] ?? null;
+            // $selectedLower = $selected ? strtolower($selected) : null;
+            $isCorrect     = $selected === $question->correct_answer;
+
+            AttemptAnswer::create([
+                'attempt_id'      => $attempt->id,
+                'question_id'     => $question->id,
+                'selected_option' => $selected,
+                'is_correct'      => $isCorrect,
+            ]);
+
+            if ($isCorrect) {
+                $score += $question->marks;
+            }
+        }
+
+        $attempt->update([
+            'score'        => $score,
+            'status'       => 'submitted',
+            'submitted_at' => now(),
+        ]);
+
+        return redirect()->route('student.result')
+            ->with('success', 'Exam submitted! You scored ' . $score . ' out of ' . $attempt->total_marks . '.');
     }
 }
