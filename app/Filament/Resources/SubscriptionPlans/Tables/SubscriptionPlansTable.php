@@ -2,7 +2,11 @@
 
 namespace App\Filament\Resources\SubscriptionPlans\Tables;
 
-use Filament\Tables;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class SubscriptionPlansTable
@@ -11,21 +15,35 @@ class SubscriptionPlansTable
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('duration_days')->label('Duration (Days)')->sortable(),
-                Tables\Columns\TextColumn::make('price')->label('Price (Paisa)')->sortable(),
-                Tables\Columns\IconColumn::make('is_active')->boolean()->label('Active'),
-                Tables\Columns\TextColumn::make('created_at')->dateTime()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('name')
+                    ->searchable(),
+                TextColumn::make('duration_days')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('price')
+                     ->label('Price')
+                    ->formatStateUsing(fn ($state) => 'Rs. ' . number_format($state / 100, 2))
+                    ->sortable(),
+                IconColumn::make('is_active')
+                    ->boolean(),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

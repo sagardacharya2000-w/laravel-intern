@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\SubscriptionPlanResource\Pages;
+namespace App\Filament\Resources\SubscriptionPlans\Pages;
 
-use App\Filament\Resources\SubscriptionPlanResource;
-use Filament\Actions;
+use App\Filament\Resources\SubscriptionPlans\SubscriptionPlanResource;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditSubscriptionPlan extends EditRecord
@@ -13,7 +13,7 @@ class EditSubscriptionPlan extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

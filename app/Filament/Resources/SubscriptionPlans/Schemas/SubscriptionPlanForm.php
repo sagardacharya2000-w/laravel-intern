@@ -2,34 +2,35 @@
 
 namespace App\Filament\Resources\SubscriptionPlans\Schemas;
 
-use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 
 class SubscriptionPlanForm
 {
-    public static function configure(Form $form): Form
+    public static function configure(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
+                    ->required(),
+                TextInput::make('duration_days')
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('period')
-                    ->options([
-                        'monthly' => 'Monthly',
-                        'yearly' => 'Yearly',
-                    ])
-                    ->required(),
-                Forms\Components\TextInput::make('price')
+                    ->numeric(),
+                TextInput::make('price')
+                ->label('Price (NPR)')
+                    ->required()
                     ->numeric()
-                    ->label('Price (Paisa)')
-                    ->required(),
-                Forms\Components\Textarea::make('description')
-                    ->maxLength(65535)
+                    ->prefix('Rs.')
+                    ->helperText('Enter the price in rupees — stored internally as paisa.')
+                    ->dehydrateStateUsing(fn ($state) => (int) round($state * 100))
+                    ->formatStateUsing(fn ($state) => $state !== null ? $state / 100 : null),
+                Textarea::make('description')
+                    ->default(null)
                     ->columnSpanFull(),
-                Forms\Components\Toggle::make('is_active')
-                    ->label('Active Status')
-                    ->default(true),
+                Toggle::make('is_active')
+                    ->required(),
             ]);
     }
 }

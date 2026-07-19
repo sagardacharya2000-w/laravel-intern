@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources\Attempts;
 
-use App\Filament\Resources\Attempts\Pages\CreateAttempt;
-use App\Filament\Resources\Attempts\Pages\EditAttempt;
 use App\Filament\Resources\Attempts\Pages\ListAttempts;
-use App\Filament\Resources\Attempts\Schemas\AttemptForm;
+use App\Filament\Resources\Attempts\Pages\ViewAttempt;
+use App\Filament\Resources\Attempts\Schemas\AttemptInfolist;
 use App\Filament\Resources\Attempts\Tables\AttemptsTable;
 use App\Models\Attempt;
 use BackedEnum;
@@ -18,15 +17,11 @@ class AttemptResource extends Resource
 {
     protected static ?string $model = Attempt::class;
 
-     protected static ?string $navigationLabel = 'Attempts';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
-
-    protected static ?string $recordTitleAttribute = 'id';
-
-    public static function form(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema
     {
-        return AttemptForm::configure($schema);
+        return AttemptInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table
@@ -41,12 +36,16 @@ class AttemptResource extends Resource
         ];
     }
 
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ListAttempts::route('/'),
-            'create' => CreateAttempt::route('/create'),
-            'edit' => EditAttempt::route('/{record}/edit'),
+            'view' => ViewAttempt::route('/{record}'),
         ];
     }
 }

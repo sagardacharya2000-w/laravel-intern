@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Attempts\Pages;
 
 use App\Filament\Resources\Attempts\AttemptResource;
-use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListAttempts extends ListRecords
@@ -12,8 +11,6 @@ class ListAttempts extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [
-            CreateAction::make(),
-        ];
+        return [];
     }
 }
