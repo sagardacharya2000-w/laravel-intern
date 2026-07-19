@@ -16,6 +16,7 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Teacher routes
 Route::middleware(['auth', 'role:teacher', 'isActive'])->group(function () {
 
     Route::get('/teacher/dashboard', [TeacherDashboardController::class, 'index'])
@@ -56,9 +57,11 @@ Route::middleware(['auth', 'role:teacher', 'isActive'])->group(function () {
     });
 });
 
+// Student routes
 Route::middleware(['auth', 'role:student', 'isActive'])->group(function () {
     Route::get('/student', [StudentController::class, 'dashboard'])->name('student.dashboard');
     Route::get('/student/courses', [StudentController::class, 'courses'])->name('student.courses');
+    Route::post('/student/courses/enroll', [StudentController::class, 'enroll'])->name('student.courses.enroll');
     Route::get('/student/exams', [StudentController::class, 'exams'])->name('student.exams');
     Route::get('/student/results', [StudentController::class, 'result'])->name('student.result');
 

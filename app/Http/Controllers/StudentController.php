@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\UpdatesOwnProfile;
 use App\Models\ExamAccess;
 use App\Models\Attempt;
 use App\Models\AttemptAnswer;
+use App\Models\SchoolClass;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -78,6 +79,34 @@ class StudentController extends Controller
         return view('student.courses', compact('enrolledClass'));
     }
 
+    public function enroll(Request $request)
+    {
+        $student = auth()->user();
+
+        $validated = $request->validate([
+            'class_code' => ['required', 'string'],
+        ]);
+
+        $class = SchoolClass::where('class_code', $validated['class_code'])->first();
+
+        if (! $class) {
+            return back()->withErrors([
+                'class_code' => 'No class found with that code.',
+            ])->withInput();
+        }
+
+        if ($student->enrolledClasses()->where('classes.id', $class->id)->exists()) {
+            return back()->withErrors([
+                'class_code' => 'You are already enrolled in this class.',
+            ])->withInput();
+        }
+
+        $student->enrolledClasses()->attach($class->id);
+
+        return redirect()->route('student.courses')
+            ->with('success', "Successfully enrolled in {$class->name}!");
+    }
+
     public function exams()
     {
         $student  = auth()->user();
@@ -125,7 +154,6 @@ class StudentController extends Controller
 
         return view('student.profile', compact('enrolledClass'));
     }
-
 
     public function examTaking(ExamAccess $examAccess)
     {
