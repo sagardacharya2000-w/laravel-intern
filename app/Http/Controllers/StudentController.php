@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\UpdatesOwnProfile;
 use App\Models\ExamAccess;
 use App\Models\Attempt;
 use App\Models\AttemptAnswer;
@@ -9,6 +10,8 @@ use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
+    use UpdatesOwnProfile;
+
     public function dashboard()
     {
         $student = auth()->user();
@@ -118,10 +121,11 @@ class StudentController extends Controller
 
     public function profile()
     {
-        return view('student.profile');
+        $enrolledClass = auth()->user()->enrolledClasses()->first();
+
+        return view('student.profile', compact('enrolledClass'));
     }
 
-    // ── EXAM TAKING ──────────────────────────────────────────────────────────
 
     public function examTaking(ExamAccess $examAccess)
     {
@@ -176,9 +180,8 @@ class StudentController extends Controller
         $score   = 0;
 
         foreach ($examAccess->questionSet->questions as $question) {
-            $selected      = $answers[$question->id] ?? null;
-            // $selectedLower = $selected ? strtolower($selected) : null;
-            $isCorrect     = $selected === $question->correct_answer;
+            $selected  = $answers[$question->id] ?? null;
+            $isCorrect = $selected === $question->correct_answer;
 
             AttemptAnswer::create([
                 'attempt_id'      => $attempt->id,

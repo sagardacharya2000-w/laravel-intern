@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Frontend\PageController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\Teacher\TeacherDashboardController;
 use App\Http\Controllers\Teacher\SubjectController;
 use App\Http\Controllers\Teacher\QuestionSetController;
@@ -15,15 +16,17 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Teacher routes
 Route::middleware(['auth', 'role:teacher', 'isActive'])->group(function () {
 
     Route::get('/teacher/dashboard', [TeacherDashboardController::class, 'index'])
         ->name('teacher.dashboard');
 
-    Route::get('/teacher/profile', function () {
-        return view('teacher.profile');
-    })->name('teacher.profile');
+    Route::get('/teacher/profile', [TeacherController::class, 'profile'])
+        ->name('teacher.profile');
+    Route::put('/teacher/profile', [TeacherController::class, 'updateProfile'])
+        ->name('teacher.profile.update');
+    Route::put('/teacher/profile/password', [TeacherController::class, 'updatePassword'])
+        ->name('teacher.profile.password');
 
     Route::prefix('teacher/subjects')->name('teacher.subjects.')->group(function () {
         Route::get('/', [SubjectController::class, 'index'])->name('index');
@@ -53,15 +56,16 @@ Route::middleware(['auth', 'role:teacher', 'isActive'])->group(function () {
     });
 });
 
-// Student routes
 Route::middleware(['auth', 'role:student', 'isActive'])->group(function () {
     Route::get('/student', [StudentController::class, 'dashboard'])->name('student.dashboard');
     Route::get('/student/courses', [StudentController::class, 'courses'])->name('student.courses');
     Route::get('/student/exams', [StudentController::class, 'exams'])->name('student.exams');
     Route::get('/student/results', [StudentController::class, 'result'])->name('student.result');
-    Route::get('/student/profile', [StudentController::class, 'profile'])->name('student.profile');
 
-    // Exam taking — new
+    Route::get('/student/profile', [StudentController::class, 'profile'])->name('student.profile');
+    Route::put('/student/profile', [StudentController::class, 'updateProfile'])->name('student.profile.update');
+    Route::put('/student/profile/password', [StudentController::class, 'updatePassword'])->name('student.profile.password');
+
     Route::get('/student/exam-taking/{examAccess}', [StudentController::class, 'examTaking'])
         ->name('student.exam-taking');
     Route::post('/student/exam-taking/{examAccess}/submit', [StudentController::class, 'submitExam'])
