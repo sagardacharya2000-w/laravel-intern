@@ -10,6 +10,7 @@ class ExamAccess extends Model
     protected $fillable = [
         'class_id',
         'question_set_id',
+        'assigned_by',
         'scheduled_at',
         'expires_at',
     ];
@@ -50,5 +51,10 @@ class ExamAccess extends Model
     public function isExpired(): bool
     {
         return now()->gt($this->expires_at);
+    }
+
+    public function assignedBy()
+    {
+        return $this->belongsTo(User::class, 'assigned_by');
     }
 }

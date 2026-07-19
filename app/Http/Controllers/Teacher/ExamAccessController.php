@@ -3,123 +3,89 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\ExamAccess;
+use App\Models\QuestionSet;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ExamAccessController extends Controller
-// NOTE: no DB imports — dummy data only
 {
-
     public function index()
     {
-        $examAccesses = collect([
-            (object)[
-                'id'           => 1,
-                'questionSet'  => (object)['title' => 'Algebra Mid-term'],
-                'schoolClass'  => (object)['name'  => 'Grade 10 Section A'],
-                'scheduled_at' => now()->subHour(),
-                'expires_at'   => now()->addHour(),
-            ],
-            (object)[
-                'id'           => 2,
-                'questionSet'  => (object)['title' => 'Science Chapter 5'],
-                'schoolClass'  => (object)['name'  => 'Grade 9 Section B'],
-                'scheduled_at' => now()->addDay(),
-                'expires_at'   => now()->addDays(2),
-            ],
-            (object)[
-                'id'           => 3,
-                'questionSet'  => (object)['title' => 'English Grammar Quiz'],
-                'schoolClass'  => (object)['name'  => 'Grade 10 Section A'],
-                'scheduled_at' => now()->subDays(3),
-                'expires_at'   => now()->subDays(2),
-            ],
-        ]);
+        $examAccesses = ExamAccess::whereHas('questionSet', function ($q) {
+            $q->where('created_by', auth()->id());
+        })
+            ->with(['questionSet', 'schoolClass'])
+            ->orderBy('scheduled_at', 'desc')
+            ->get();
 
         return view('teacher.exam-access.index', compact('examAccesses'));
     }
 
-
     public function create()
     {
-        $questionSets = collect([
-
-            (object)['id' => 1, 'title' => 'Algebra Mid-term'],
-            (object)['id' => 2, 'title' => 'Science Chapter 5'],
-            (object)['id' => 3, 'title' => 'English Grammar Quiz'],
-        ]);
-
-        $classes = collect([
-
-            (object)['id' => 1, 'name' => 'Grade 10 Section A'],
-            (object)['id' => 2, 'name' => 'Grade 9 Section B'],
-        ]);
+        $questionSets = QuestionSet::where('created_by', auth()->id())->get();
+        $classes      = auth()->user()->taughtClasses()->get();
 
         return view('teacher.exam-access.create', compact('questionSets', 'classes'));
     }
 
-
     public function store(Request $request)
     {
-        $request->validate([
-            'question_set_id' => 'required',
-            'class_id'        => 'required',
-            'scheduled_at'    => 'required|date',
-            'expires_at'      => 'required|date|after:scheduled_at',
+        $validated = $this->validateExamAccess($request);
 
-        ]);
-
-
+        ExamAccess::create($validated);
 
         return redirect()->route('teacher.exam-access.index')
-            ->with('success', 'Exam access created! (dummy — backend will save to DB)');
+            ->with('success', 'Exam access created successfully!');
     }
 
-
-    public function edit($examAccess)
+    public function edit(ExamAccess $examAccess)
     {
-        $examAccess = (object)[
-            'id'              => $examAccess,
-            // use URL id so form action URL stays correct
-            'question_set_id' => 1,
-            'class_id'        => 1,
-            'scheduled_at'    => now()->subHour(),
-            'expires_at'      => now()->addHour(),
-        ];
+        abort_unless($examAccess->questionSet->created_by === auth()->id(), 403);
 
-        $questionSets = collect([
-            (object)['id' => 1, 'title' => 'Algebra Mid-term'],
-            (object)['id' => 2, 'title' => 'Science Chapter 5'],
-            (object)['id' => 3, 'title' => 'English Grammar Quiz'],
-        ]);
-
-        $classes = collect([
-            (object)['id' => 1, 'name' => 'Grade 10 Section A'],
-            (object)['id' => 2, 'name' => 'Grade 9 Section B'],
-        ]);
+        $questionSets = QuestionSet::where('created_by', auth()->id())->get();
+        $classes      = auth()->user()->taughtClasses()->get();
 
         return view('teacher.exam-access.edit', compact('examAccess', 'questionSets', 'classes'));
     }
 
-
-    public function update(Request $request, $examAccess)
+    public function update(Request $request, ExamAccess $examAccess)
     {
-        $request->validate([
-            'question_set_id' => 'required',
-            'class_id'        => 'required',
-            'scheduled_at'    => 'required|date',
-            'expires_at'      => 'required|date|after:scheduled_at',
-        ]);
+        abort_unless($examAccess->questionSet->created_by === auth()->id(), 403);
 
-        // no DB update — backend will add real update logic
+        $validated = $this->validateExamAccess($request);
+
+        $examAccess->update($validated);
+
         return redirect()->route('teacher.exam-access.index')
-            ->with('success', 'Exam access updated! (dummy — backend will update DB)');
+            ->with('success', 'Exam access updated successfully!');
+    }
+
+    public function destroy(ExamAccess $examAccess)
+    {
+        abort_unless($examAccess->questionSet->created_by === auth()->id(), 403);
+
+        $examAccess->delete();
+
+        return redirect()->route('teacher.exam-access.index')
+            ->with('success', 'Exam access deleted successfully!');
     }
 
 
-    public function destroy($examAccess)
+    private function validateExamAccess(Request $request): array
     {
-        // no DB delete — backend will add real delete logic
-        return redirect()->route('teacher.exam-access.index')
-            ->with('success', 'Exam access deleted! (dummy — backend will delete from DB)');
+        return $request->validate([
+            'question_set_id' => [
+                'required',
+                Rule::exists('question_sets', 'id')->where('created_by', auth()->id()),
+            ],
+            'class_id' => [
+                'required',
+                Rule::exists('classes', 'id')->where('teacher_id', auth()->id()),
+            ],
+            'scheduled_at' => ['required', 'date'],
+            'expires_at'   => ['required', 'date', 'after:scheduled_at'],
+        ]);
     }
 }
