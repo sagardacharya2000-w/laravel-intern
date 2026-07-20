@@ -34,5 +34,11 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'khalti' => [
+    'secret_key' => env('KHALTI_SECRET_KEY'),
+    'base_url' => env('KHALTI_BASE_URL', 'https://dev.khalti.com/api/v2'),
+    'return_url' => env('KHALTI_RETURN_URL', env('APP_URL') . '/payment/callback'),
+    'website_url' => env('APP_URL'),
+],
 
 ];

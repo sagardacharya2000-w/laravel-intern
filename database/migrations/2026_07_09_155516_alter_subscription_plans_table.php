@@ -8,17 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('subscription_plans', function (Blueprint $table) {
-            $table->dropColumn('period');
-            $table->unsignedInteger('duration_days')->after('name');
-        });
+        // Left empty intentionally
     }
 
     public function down(): void
     {
-        Schema::table('subscription_plans', function (Blueprint $table) {
-            $table->dropColumn('duration_days');
-            $table->enum('period', ['monthly', 'yearly']);
-        });
+        // Left empty intentionally
     }
 };
