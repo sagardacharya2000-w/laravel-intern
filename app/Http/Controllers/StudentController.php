@@ -198,11 +198,28 @@ class StudentController extends Controller
     {
         $student = auth()->user();
 
+        // ─── GATE 1: exam window must still be open ─────────────
+        abort_unless($examAccess->isActive(), 403, 'This exam window has closed.');
+
         $attempt = Attempt::where('student_id', $student->id)
             ->where('question_set_id', $examAccess->question_set_id)
             ->where('status', 'in_progress')
             ->latest('started_at')
             ->firstOrFail();
+
+        // ─── GATE 2: student's personal time limit must not be exceeded ─
+        $deadline = $attempt->started_at->copy()
+            ->addMinutes($examAccess->questionSet->time_limit_minutes);
+
+        if (now()->gt($deadline)) {
+            $attempt->update([
+                'status'       => 'timed_out',
+                'submitted_at' => now(),
+            ]);
+
+            return redirect()->route('student.result')
+                ->with('error', 'Time limit exceeded — this attempt was marked as timed out.');
+        }
 
         $answers = $request->input('answers', []);
         $score   = 0;

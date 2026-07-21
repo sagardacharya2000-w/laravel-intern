@@ -318,6 +318,13 @@
 .os-faq-a { padding: 0 1.25rem 1rem; font-size: 0.855rem; color: var(--muted); line-height: 1.7; display: none; }
 .os-faq-item.open .os-faq-a { display: block; }
 
+/* ── ABOUT / CONTACT ── */
+.os-contact-list { max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.75rem; text-align: center; }
+.os-contact-list div { font-size: 0.9rem; color: var(--muted); }
+.os-contact-list strong { color: var(--text); }
+.os-contact-list a { color: var(--blue); text-decoration: none; font-weight: 600; }
+.os-contact-list a:hover { text-decoration: underline; }
+
 /* ── CTA ── */
 .os-cta { padding: 5rem 5%; }
 .os-cta-box {
@@ -691,6 +698,35 @@
                 <div class="os-faq-a">Yes — all pages are fully responsive using Bootstrap 5. Students can attempt exams on a phone or tablet. The timer and auto-submit work correctly on all screen sizes.</div>
             </div>
         </div>
+    </div>
+</section>
+
+{{-- ═══════════════════════════════════════ --}}
+{{-- ABOUT                                  --}}
+{{-- ═══════════════════════════════════════ --}}
+<section class="os-section-bg" id="about">
+    <div class="os-section-bg-inner">
+        <div class="os-sec-eye">
+            <span class="os-eye-line"></span><span class="os-eye-text">About Us</span><span class="os-eye-line"></span>
+        </div>
+        <h2 class="os-sec-h">Built for Nepali schools, by people who get it.</h2>
+        <p class="os-sec-p">Online Siksha started with a simple idea — exams shouldn't need paper, printing, or piles of answer sheets to grade by hand. We built a platform that lets teachers create question sets, schedule exams, and get instant results, while students take exams securely from anywhere with role-based access.</p>
+    </div>
+</section>
+
+{{-- ═══════════════════════════════════════ --}}
+{{-- CONTACT                                --}}
+{{-- ═══════════════════════════════════════ --}}
+<section class="os-section" id="contact">
+    <div class="os-sec-eye">
+        <span class="os-eye-line"></span><span class="os-eye-text">Contact</span><span class="os-eye-line"></span>
+    </div>
+    <h2 class="os-sec-h">Get in touch</h2>
+    <p class="os-sec-p">Have a question or want a demo for your school? Reach out and we'll get back to you.</p>
+    <div class="os-contact-list">
+        <div><strong>Email:</strong> <a href="mailto:hello@onlinesiksha.com">hello@onlinesiksha.com</a></div>
+        <div><strong>Phone:</strong> <a href="tel:+9779800000000">+977 98-0000-0000</a></div>
+        <div><strong>Location:</strong> Kathmandu, Nepal</div>
     </div>
 </section>
 

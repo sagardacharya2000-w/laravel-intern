@@ -33,6 +33,7 @@ class ExamAccessController extends Controller
     public function store(Request $request)
     {
         $validated = $this->validateExamAccess($request);
+        $validated['assigned_by'] = auth()->id();
 
         ExamAccess::create($validated);
 

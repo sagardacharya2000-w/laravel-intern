@@ -28,11 +28,9 @@
                 @if (auth()->user()->role === 'admin')
                     <a href="/admin" class="os-btn-ghost">Admin Panel</a>
                 @elseif(auth()->user()->role === 'teacher')
-                    {{-- <a href="{{ route('teacher.dashboard') }}" class="os-btn-ghost">Dashboard</a> --}}
-                    <a href="#" class="os-btn-ghost">Dashboard</a>
+                    <a href="{{ route('teacher.dashboard') }}" class="os-btn-ghost">Dashboard</a>
                 @else
-                    {{-- <a href="{{ route('student.dashboard') }}" class="os-btn-ghost">Dashboard</a> --}}
-                    <a href="#" class="os-btn-ghost">Dashboard</a>
+                    <a href="{{ route('student.dashboard') }}" class="os-btn-ghost">Dashboard</a>
                 @endif
                 <form method="POST" action="{{ route('logout') }}" style="display:inline">
                     @csrf
