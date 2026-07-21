@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\Attempts\Pages;
 
 use App\Filament\Resources\Attempts\AttemptResource;
-use Filament\Resources\Pages\CreateRecord;
+use Filament\Resources\Pages\ViewRecord;
 
-class CreateAttempt extends CreateRecord
+class ViewAttempt extends ViewRecord
 {
     protected static string $resource = AttemptResource::class;
 }

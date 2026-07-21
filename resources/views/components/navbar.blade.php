@@ -28,19 +28,16 @@
                 @if (auth()->user()->role === 'admin')
                     <a href="/admin" class="os-btn-ghost">Admin Panel</a>
                 @elseif(auth()->user()->role === 'teacher')
-                    {{-- <a href="{{ route('teacher.dashboard') }}" class="os-btn-ghost">Dashboard</a> --}}
-                    <a href="#" class="os-btn-ghost">Dashboard</a>
+                    <a href="{{ route('teacher.dashboard') }}" class="os-btn-ghost">Dashboard</a>
                 @else
-                    {{-- <a href="{{ route('student.dashboard') }}" class="os-btn-ghost">Dashboard</a> --}}
-                    <a href="#" class="os-btn-ghost">Dashboard</a>
+                    <a href="{{ route('student.dashboard') }}" class="os-btn-ghost">Dashboard</a>
                 @endif
                 <form method="POST" action="{{ route('logout') }}" style="display:inline">
                     @csrf
                     <button type="submit" class="os-btn-primary">Log Out</button>
                 </form>
             @else
-                <a href="{{ route('login') }}" class="os-btn-ghost">Log In</a>
-                <a href="{{ route('login') }}" class="os-btn-primary">Get Started Free</a>
+                <a href="{{ route('login') }}" class="os-btn-primary">Log In</a>
             @endauth
         </div>
 
@@ -64,10 +61,8 @@
             @auth
                 <a href="{{ route('logout') }}" class="os-btn-primary" style="width:100%;text-align:center">Log Out</a>
             @else
-                <a href="{{ route('login') }}" class="os-btn-ghost"
-                    style="width:100%;text-align:center;display:block;margin-bottom:8px">Log In</a>
-                <a href="{{ route('login') }}" class="os-btn-primary" style="width:100%;text-align:center;display:block">Get
-                    Started Free</a>
+                <a href="{{ route('login') }}" class="os-btn-primary"
+                    style="width:100%;text-align:center;display:block">Log In</a>
             @endauth
         </div>
     </div>

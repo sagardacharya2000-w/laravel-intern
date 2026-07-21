@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ExamAccesses\Schemas;
 use App\Models\QuestionSet;
 use App\Models\SchoolClass;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Schema;
 
@@ -26,11 +27,6 @@ class ExamAccessForm
                     ->searchable()
                     ->preload()
                     ->required(),
-                   Select::make('assigned_by')
-                ->label('Assigned By')
-                ->default(auth()->id())
-               ->required()
-                ->disabled(),
                 DateTimePicker::make('scheduled_at')
                     ->label('Scheduled At')
                     ->required(),

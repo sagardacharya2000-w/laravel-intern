@@ -5,6 +5,8 @@ namespace App\Filament\Resources\SubscriptionPlans\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class SubscriptionPlansTable
@@ -13,7 +15,25 @@ class SubscriptionPlansTable
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('name')
+                    ->searchable(),
+                TextColumn::make('duration_days')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('price')
+                     ->label('Price')
+                    ->formatStateUsing(fn ($state) => 'Rs. ' . number_format($state / 100, 2))
+                    ->sortable(),
+                IconColumn::make('is_active')
+                    ->boolean(),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //

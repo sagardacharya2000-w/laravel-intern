@@ -242,4 +242,4 @@
     </script>
     </x-slot:scripts>
 
-</x-layout>
+</x-layouts.teacher>

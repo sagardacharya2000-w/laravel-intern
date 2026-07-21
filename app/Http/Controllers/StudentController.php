@@ -2,57 +2,64 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\UpdatesOwnProfile;
+use App\Models\ExamAccess;
+use App\Models\Attempt;
+use App\Models\AttemptAnswer;
+use App\Models\SchoolClass;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
+    use UpdatesOwnProfile;
+
     public function dashboard()
     {
-        $enrolledClass = (object)[
-            'name'       => 'Grade 10 Section A',
-            'class_code' => 'G10A2026',
-        ];
+        $student = auth()->user();
 
-        $upcomingCount  = 2;
-        $completedCount = 5;
-        $averageScore   = 78;
+        $enrolledClasses = $student->enrolledClasses()->get();
+        $enrolledClass   = $enrolledClasses->first();
+        $classIds        = $enrolledClasses->pluck('id');
 
-        $availableExams = collect([
-            (object)[
-                'subject'            => 'Mathematics',
-                'title'              => 'Algebra Mid-term',
-                'time_limit_minutes' => 30,
-                'total_marks'        => 20,
-                'is_active'          => true,
-                'scheduled_at'       => now()->subHour(),
-            ],
-            (object)[
-                'subject'            => 'Science',
-                'title'              => 'Chapter 5 Quiz',
-                'time_limit_minutes' => 20,
-                'total_marks'        => 16,
-                'is_active'          => false,
-                'scheduled_at'       => now()->addHours(3),
-            ],
-        ]);
+        $examAccesses = ExamAccess::whereIn('class_id', $classIds)
+            ->with(['questionSet.subject', 'questionSet.questions'])
+            ->get();
 
-        $attemptHistory = collect([
-            (object)[
-                'subject'     => 'English',
-                'title'       => 'Grammar Quiz',
-                'date'        => now()->subDays(2),
-                'score'       => 12,
-                'total_marks' => 15,
-                'percentage'  => 80,
-            ],
-            (object)[
-                'subject'     => 'Mathematics',
-                'title'       => 'Geometry Basics',
-                'date'        => now()->subDays(5),
-                'score'       => 7,
-                'total_marks' => 10,
-                'percentage'  => 70,
-            ],
+        $upcomingCount = $examAccesses->filter(fn($ea) => $ea->isUpcoming())->count();
+
+        $availableExams = $examAccesses
+            ->filter(fn($ea) => ! $ea->isExpired())
+            ->sortBy('scheduled_at')
+            ->map(fn($ea) => (object) [
+                'exam_access_id'     => $ea->id,
+                'question_set_id'    => $ea->question_set_id,
+                'subject'            => $ea->questionSet->subject->name ?? '—',
+                'title'              => $ea->questionSet->title,
+                'time_limit_minutes' => $ea->questionSet->time_limit_minutes,
+                'total_marks'        => $ea->questionSet->questions->sum('marks'),
+                'is_active'          => $ea->isActive(),
+                'scheduled_at'       => $ea->scheduled_at,
+            ])
+            ->values();
+
+        $completedAttempts = $student->attempts()
+            ->whereIn('status', ['submitted', 'timed_out'])
+            ->with('questionSet.subject')
+            ->latest('submitted_at')
+            ->get();
+
+        $completedCount = $completedAttempts->count();
+        $averageScore   = $completedCount
+            ? round($completedAttempts->avg(fn($a) => $a->percentage()))
+            : 0;
+
+        $attemptHistory = $completedAttempts->take(5)->map(fn($attempt) => (object) [
+            'subject'     => $attempt->questionSet->subject->name ?? '—',
+            'title'       => $attempt->questionSet->title ?? '—',
+            'date'        => $attempt->submitted_at,
+            'score'       => $attempt->score,
+            'total_marks' => $attempt->total_marks,
+            'percentage'  => $attempt->percentage(),
         ]);
 
         return view('student.dashboard', compact(
@@ -67,87 +74,179 @@ class StudentController extends Controller
 
     public function courses()
     {
-        // dummy enrolled class
-        $enrolledClass = (object)[
-            'name'       => 'Grade 10 Section A',
-            'class_code' => 'G10A2026',
-        ];
+        $enrolledClass = auth()->user()->enrolledClasses()->first();
 
         return view('student.courses', compact('enrolledClass'));
     }
 
+    public function enroll(Request $request)
+    {
+        $student = auth()->user();
+
+        $validated = $request->validate([
+            'class_code' => ['required', 'string'],
+        ]);
+
+        $class = SchoolClass::where('class_code', $validated['class_code'])->first();
+
+        if (! $class) {
+            return back()->withErrors([
+                'class_code' => 'No class found with that code.',
+            ])->withInput();
+        }
+
+        if ($student->enrolledClasses()->where('classes.id', $class->id)->exists()) {
+            return back()->withErrors([
+                'class_code' => 'You are already enrolled in this class.',
+            ])->withInput();
+        }
+
+        $student->enrolledClasses()->attach($class->id);
+
+        return redirect()->route('student.courses')
+            ->with('success', "Successfully enrolled in {$class->name}!");
+    }
+
     public function exams()
     {
-        // dummy exams for student's enrolled class
-        $exams = collect([
-            (object)[
-                'id'                 => 1,
-                'subject'            => 'Mathematics',
-                'title'              => 'Algebra Mid-term',
-                'time_limit_minutes' => 30,
-                'total_marks'        => 20,
-                'scheduled_at'       => now()->subHour(),
-                'expires_at'         => now()->addHour(),
-            ],
-            (object)[
-                'id'                 => 2,
-                'subject'            => 'Science',
-                'title'              => 'Chapter 5 Quiz',
-                'time_limit_minutes' => 20,
-                'total_marks'        => 16,
-                'scheduled_at'       => now()->addDay(),
-                'expires_at'         => now()->addDays(2),
-            ],
-            (object)[
-                'id'                 => 3,
-                'subject'            => 'English',
-                'title'              => 'Grammar Test',
-                'time_limit_minutes' => 25,
-                'total_marks'        => 15,
-                'scheduled_at'       => now()->subDays(3),
-                'expires_at'         => now()->subDays(2),
-            ],
-        ]);
+        $student  = auth()->user();
+        $classIds = $student->enrolledClasses()->pluck('classes.id');
+
+        $exams = ExamAccess::whereIn('class_id', $classIds)
+            ->with(['questionSet.subject', 'questionSet.questions'])
+            ->orderBy('scheduled_at')
+            ->get()
+            ->map(fn($ea) => (object) [
+                'id'                 => $ea->id,
+                'subject'            => $ea->questionSet->subject->name ?? '—',
+                'title'              => $ea->questionSet->title,
+                'time_limit_minutes' => $ea->questionSet->time_limit_minutes,
+                'total_marks'        => $ea->questionSet->questions->sum('marks'),
+                'scheduled_at'       => $ea->scheduled_at,
+                'expires_at'         => $ea->expires_at,
+            ]);
 
         return view('student.exams', compact('exams'));
     }
 
     public function result()
     {
-        // dummy attempt history
-        $attempts = collect([
-            (object)[
-                'subject'      => 'English',
-                'title'        => 'Grammar Quiz',
-                'submitted_at' => now()->subDays(2),
-                'score'        => 12,
-                'total_marks'  => 15,
-                'percentage'   => 80,
-            ],
-            (object)[
-                'subject'      => 'Mathematics',
-                'title'        => 'Geometry Basics',
-                'submitted_at' => now()->subDays(5),
-                'score'        => 7,
-                'total_marks'  => 10,
-                'percentage'   => 70,
-            ],
-            (object)[
-                'subject'      => 'Science',
-                'title'        => 'Chapter 3 Test',
-                'submitted_at' => now()->subDays(8),
-                'score'        => 18,
-                'total_marks'  => 20,
-                'percentage'   => 90,
-            ],
-        ]);
+        $attempts = auth()->user()->attempts()
+            ->whereIn('status', ['submitted', 'timed_out'])
+            ->with('questionSet.subject')
+            ->latest('submitted_at')
+            ->get()
+            ->map(fn($attempt) => (object) [
+                'subject'      => $attempt->questionSet->subject->name ?? '—',
+                'title'        => $attempt->questionSet->title ?? '—',
+                'submitted_at' => $attempt->submitted_at,
+                'score'        => $attempt->score,
+                'total_marks'  => $attempt->total_marks,
+                'percentage'   => $attempt->percentage(),
+            ]);
 
         return view('student.result', compact('attempts'));
     }
 
     public function profile()
     {
-        // uses auth()->user() directly in blade — no dummy data needed
-        return view('student.profile');
+        $enrolledClass = auth()->user()->enrolledClasses()->first();
+
+        return view('student.profile', compact('enrolledClass'));
+    }
+
+    public function examTaking(ExamAccess $examAccess)
+    {
+        $student = auth()->user();
+
+        $enrolledClassIds = $student->enrolledClasses()->pluck('classes.id');
+        abort_unless($enrolledClassIds->contains($examAccess->class_id), 403);
+
+        abort_unless($examAccess->isActive(), 403, 'This exam is not currently available.');
+
+        $questionSet = $examAccess->questionSet;
+        $questions   = $questionSet->questions;
+
+        if ($questionSet->is_randomized) {
+            $questions = $questions->shuffle();
+        }
+
+        $attempt = Attempt::firstOrCreate(
+            [
+                'student_id'      => $student->id,
+                'question_set_id' => $questionSet->id,
+                'status'          => 'in_progress',
+            ],
+            [
+                'total_marks' => $questions->sum('marks'),
+                'started_at'  => now(),
+            ]
+        );
+
+        $exam = (object) [
+            'exam_access_id'     => $examAccess->id,
+            'title'              => $questionSet->title,
+            'subject'            => $questionSet->subject->name ?? '—',
+            'time_limit_minutes' => $questionSet->time_limit_minutes,
+            'total_marks'        => $questions->sum('marks'),
+        ];
+
+        return view('student.exam-taking', compact('exam', 'questions', 'attempt'));
+    }
+
+    public function submitExam(Request $request, ExamAccess $examAccess)
+    {
+        $student = auth()->user();
+
+        // ─── GATE 1: exam window must still be open ─────────────
+        abort_unless($examAccess->isActive(), 403, 'This exam window has closed.');
+
+        $attempt = Attempt::where('student_id', $student->id)
+            ->where('question_set_id', $examAccess->question_set_id)
+            ->where('status', 'in_progress')
+            ->latest('started_at')
+            ->firstOrFail();
+
+        // ─── GATE 2: student's personal time limit must not be exceeded ─
+        $deadline = $attempt->started_at->copy()
+            ->addMinutes($examAccess->questionSet->time_limit_minutes);
+
+        if (now()->gt($deadline)) {
+            $attempt->update([
+                'status'       => 'timed_out',
+                'submitted_at' => now(),
+            ]);
+
+            return redirect()->route('student.result')
+                ->with('error', 'Time limit exceeded — this attempt was marked as timed out.');
+        }
+
+        $answers = $request->input('answers', []);
+        $score   = 0;
+
+        foreach ($examAccess->questionSet->questions as $question) {
+            $selected  = $answers[$question->id] ?? null;
+            $isCorrect = $selected === $question->correct_answer;
+
+            AttemptAnswer::create([
+                'attempt_id'      => $attempt->id,
+                'question_id'     => $question->id,
+                'selected_option' => $selected,
+                'is_correct'      => $isCorrect,
+            ]);
+
+            if ($isCorrect) {
+                $score += $question->marks;
+            }
+        }
+
+        $attempt->update([
+            'score'        => $score,
+            'status'       => 'submitted',
+            'submitted_at' => now(),
+        ]);
+
+        return redirect()->route('student.result')
+            ->with('success', 'Exam submitted! You scored ' . $score . ' out of ' . $attempt->total_marks . '.');
     }
 }

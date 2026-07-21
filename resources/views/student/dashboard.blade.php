@@ -1,9 +1,7 @@
 <x-student>
 
-
     <x-slot name="title">Student Dashboard — Online Siksha</x-slot>
     <x-slot name="pageTitle">Dashboard</x-slot>
-
 
     <div class="panel">
         <div style="padding: 24px;">
@@ -52,7 +50,8 @@
                         <span><i class="ti ti-star"></i> {{ $exam->total_marks }} marks</span>
                     </div>
                     @if($exam->is_active)
-                        <a href="#" class="btn-primary" style="width:100%;justify-content:center;">
+                        <a href="{{ route('student.exam-taking', $exam->exam_access_id) }}"
+                            class="btn-primary" style="width:100%;justify-content:center;">
                             Start Exam
                         </a>
                     @else
