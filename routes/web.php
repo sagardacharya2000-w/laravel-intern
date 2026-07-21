@@ -3,12 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Frontend\PageController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\Teacher\TeacherDashboardController;
 use App\Http\Controllers\Teacher\SubjectController;
 use App\Http\Controllers\Teacher\QuestionSetController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\Teacher\ExamAccessController;
+
 
 
 Route::get('/', [PageController::class, 'home'])->name('home');
@@ -73,4 +75,7 @@ Route::middleware(['auth', 'role:student', 'isActive'])->group(function () {
         ->name('student.exam-taking');
     Route::post('/student/exam-taking/{examAccess}/submit', [StudentController::class, 'submitExam'])
         ->name('student.exam-taking.submit');
+    Route::get('/student/plans', [PaymentController::class, 'plans'])->name('student.plans');
+    Route::post('/student/subscribe/{plan}', [PaymentController::class, 'subscribe'])->name('student.subscribe');
+    Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
 });

@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Subscription extends Model
 {
     protected $fillable = [
-        'subscription_plan_id',
+        'user_id',
+        'plan_id',
         'status',      // active | expired | cancelled
         'starts_at',
         'expires_at',
@@ -18,11 +19,14 @@ class Subscription extends Model
         'expires_at' => 'datetime',
     ];
 
-    // ─── Relationships ───────────────────────────────────────────────────────────
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function plan()
     {
-        return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_id');
+        return $this->belongsTo(SubscriptionPlan::class, 'plan_id');
     }
 
     public function payments()
@@ -30,14 +34,11 @@ class Subscription extends Model
         return $this->hasMany(Payment::class);
     }
 
-    // ─── Helpers ────────────────────────────────────────────────────────────────
-
     public function isActive(): bool
     {
         return $this->status === 'active' && now()->lte($this->expires_at);
     }
 
-    /** Days remaining until expiry */
     public function daysRemaining(): int
     {
         if ($this->isExpired()) {

@@ -9,23 +9,23 @@ class SubscriptionPlan extends Model
     protected $fillable = [
         'name',
         'duration_days',
-        'price',        // stored in PAISA (e.g. 100000 = Rs. 1,000) for Khalti compatibility
+        'price',        // in PAISA (e.g. 100000 = Rs. 1,000) for Khalti
         'description',
         'is_active',
     ];
 
-    // ─── Relationships ───────────────────────────────────────────────────────────
-
     public function subscriptions()
     {
-        return $this->hasMany(Subscription::class);
+        return $this->hasMany(Subscription::class, 'plan_id');
     }
 
-    // ─── Helpers ────────────────────────────────────────────────────────────────
-
-    /** Returns price in Rupees for display purposes */
     public function priceInRupees(): float
     {
         return $this->price / 100;
+    }
+
+    public function expiryFromNow(): \Illuminate\Support\Carbon
+    {
+        return now()->addDays($this->duration_days);
     }
 }

@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Payment extends Model
 {
     protected $fillable = [
+        'user_id',
         'subscription_id',
-        'amount',           // in PAISA — matches Khalti's requirement
+        'plan_id',
+        'amount',           // in PAISA
         'status',           // pending | success | failed
-        'khalti_pidx',      // Payment ID from Khalti initiate response
-        'khalti_txn_id',    // Transaction ID from Khalti lookup response
+        'khalti_pidx',
+        'khalti_txn_id',
         'failure_reason',
         'paid_at',
     ];
@@ -20,14 +22,20 @@ class Payment extends Model
         'paid_at' => 'datetime',
     ];
 
-    // ─── Relationships ───────────────────────────────────────────────────────────
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function subscription()
     {
         return $this->belongsTo(Subscription::class);
     }
 
-    // ─── Helpers ────────────────────────────────────────────────────────────────
+    public function plan()
+    {
+        return $this->belongsTo(SubscriptionPlan::class, 'plan_id');
+    }
 
     public function amountInRupees(): float
     {
