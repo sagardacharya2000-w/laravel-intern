@@ -17,6 +17,50 @@
         </div>
     </div>
 
+    {{-- ─── Membership Banner ─────────────────────────────────────────── --}}
+    @if($isPro)
+        @php
+            $daysLeft = now()->diffInDays($activeSubscription->expires_at, false);
+        @endphp
+        <div class="panel" style="background:linear-gradient(135deg,#4338ca,#6d28d9);border:none;">
+            <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                <div style="display:flex;align-items:center;gap:14px;">
+                    <div style="background:rgba(255,255,255,0.15);width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                        <i class="ti ti-crown" style="font-size:22px;color:#fbbf24;"></i>
+                    </div>
+                    <div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="background:#fbbf24;color:#111827;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;letter-spacing:.03em;">PRO MEMBER</span>
+                            <span style="color:#fff;font-weight:700;font-size:14px;">{{ $activeSubscription->plan->name }}</span>
+                        </div>
+                        <p style="margin:4px 0 0;color:rgba(255,255,255,0.8);font-size:13px;">
+                            Expires {{ $activeSubscription->expires_at->format('d M, Y') }}
+                        </p>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="color:#fff;font-size:24px;font-weight:800;">{{ max($daysLeft, 0) }}</div>
+                    <div style="color:rgba(255,255,255,0.75);font-size:12px;">days remaining</div>
+                </div>
+            </div>
+        </div>
+    @else
+        <div class="panel">
+            <div style="padding:18px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <i class="ti ti-lock" style="font-size:20px;color:#9ca3af;"></i>
+                    <div>
+                        <div style="font-weight:700;font-size:14px;color:#111827;">You're on the Free plan</div>
+                        <p style="margin:2px 0 0;color:#6b7280;font-size:13px;">
+                            Unlock premium exams and unlimited re-attempts with Pro.
+                        </p>
+                    </div>
+                </div>
+                <a href="{{ route('student.plans') }}" class="btn-primary">Upgrade to Pro</a>
+            </div>
+        </div>
+    @endif
+
     <div class="stat-grid">
         <div class="stat-card">
             <div class="stat-label"><i class="ti ti-file-text"></i> Upcoming Exams</div>
@@ -42,14 +86,24 @@
         @else
             <div class="exam-card-grid">
                 @foreach($availableExams as $exam)
-                <div class="exam-card">
+                <div class="exam-card" style="position:relative;">
+                    @if($exam->is_premium)
+                        <span style="position:absolute;top:14px;right:14px;background:#fbbf24;color:#111827;font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;">PRO</span>
+                    @endif
+
                     <div class="exam-card-subject">{{ $exam->subject }}</div>
                     <div class="exam-card-title">{{ $exam->title }}</div>
                     <div class="exam-card-meta">
                         <span><i class="ti ti-clock"></i> {{ $exam->time_limit_minutes }} min</span>
                         <span><i class="ti ti-star"></i> {{ $exam->total_marks }} marks</span>
                     </div>
-                    @if($exam->is_active)
+
+                    @if($exam->is_locked)
+                        <a href="{{ route('student.plans') }}"
+                            class="btn-secondary" style="width:100%;justify-content:center;">
+                            <i class="ti ti-lock"></i> Unlock with Pro
+                        </a>
+                    @elseif($exam->is_active)
                         <a href="{{ route('student.exam-taking', $exam->exam_access_id) }}"
                             class="btn-primary" style="width:100%;justify-content:center;">
                             Start Exam

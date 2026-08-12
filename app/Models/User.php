@@ -89,14 +89,40 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Attempt::class, 'student_id');
     }
 
-    public function notifications()
+   public function notifications()
     {
         return $this->hasMany(Notification::class);
     }
 
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    /** The student's currently active (not expired) subscription, if any */
+    public function activeSubscription()
+    {
+        return $this->subscriptions()
+            ->where('status', 'active')
+            ->where('expires_at', '>=', now())
+            ->latest('expires_at')
+            ->first();
+    }
+
+    /** Is this student currently a paying "Pro" member? */
+    public function isPro(): bool
+    {
+        return $this->activeSubscription() !== null;
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
-        
+
         return $this->isAdmin();
     }
 }
