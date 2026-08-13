@@ -15,17 +15,19 @@ class QuestionSet extends Model
         'title',
         'time_limit_minutes',
         'is_randomized',
+        'is_premium',
     ];
 
     protected $casts = [
         'is_randomized' => 'boolean',
+        'is_premium' => 'boolean',
     ];
 
     // ─── Relationships ───────────────────────────────────────────────────────────
 
     public function teacher()
     {
-        return $this->belongsTo(User::class, 'created_by')->withTrashed(); 
+        return $this->belongsTo(User::class, 'created_by')->withTrashed();
     }
 
     public function subject()

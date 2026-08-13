@@ -21,25 +21,46 @@ class StudentController extends Controller
         $enrolledClass   = $enrolledClasses->first();
         $classIds        = $enrolledClasses->pluck('id');
 
+        $activeSubscription = $student->activeSubscription();
+        $isPro = $activeSubscription !== null;
+
         $examAccesses = ExamAccess::whereIn('class_id', $classIds)
             ->with(['questionSet.subject', 'questionSet.questions'])
             ->get();
 
         $upcomingCount = $examAccesses->filter(fn($ea) => $ea->isUpcoming())->count();
 
+        // How many times has this student already attempted each question set?
+        // (used to enforce the free-tier "1 attempt" limit)
+        $attemptCounts = $student->attempts()
+            ->whereIn('status', ['submitted', 'timed_out'])
+            ->get()
+            ->countBy('question_set_id');
+
         $availableExams = $examAccesses
             ->filter(fn($ea) => ! $ea->isExpired())
             ->sortBy('scheduled_at')
-            ->map(fn($ea) => (object) [
-                'exam_access_id'     => $ea->id,
-                'question_set_id'    => $ea->question_set_id,
-                'subject'            => $ea->questionSet->subject->name ?? '—',
-                'title'              => $ea->questionSet->title,
-                'time_limit_minutes' => $ea->questionSet->time_limit_minutes,
-                'total_marks'        => $ea->questionSet->questions->sum('marks'),
-                'is_active'          => $ea->isActive(),
-                'scheduled_at'       => $ea->scheduled_at,
-            ])
+            ->map(function ($ea) use ($isPro, $attemptCounts) {
+                $isPremium = $ea->questionSet->is_premium;
+                $attemptsUsed = $attemptCounts->get($ea->question_set_id, 0);
+
+                // Locked if: it's a premium exam and student isn't Pro,
+                // OR it's a free exam they've already used their one free attempt on.
+                $isLocked = (! $isPro) && ($isPremium || $attemptsUsed >= 1);
+
+                return (object) [
+                    'exam_access_id'     => $ea->id,
+                    'question_set_id'    => $ea->question_set_id,
+                    'subject'            => $ea->questionSet->subject->name ?? '—',
+                    'title'              => $ea->questionSet->title,
+                    'time_limit_minutes' => $ea->questionSet->time_limit_minutes,
+                    'total_marks'        => $ea->questionSet->questions->sum('marks'),
+                    'is_active'          => $ea->isActive(),
+                    'scheduled_at'       => $ea->scheduled_at,
+                    'is_premium'         => $isPremium,
+                    'is_locked'          => $isLocked,
+                ];
+            })
             ->values();
 
         $completedAttempts = $student->attempts()
@@ -68,7 +89,9 @@ class StudentController extends Controller
             'completedCount',
             'averageScore',
             'availableExams',
-            'attemptHistory'
+            'attemptHistory',
+            'isPro',
+            'activeSubscription'
         ));
     }
 
@@ -112,21 +135,36 @@ class StudentController extends Controller
         $student  = auth()->user();
         $classIds = $student->enrolledClasses()->pluck('classes.id');
 
+        $isPro = $student->isPro();
+
+        $attemptCounts = $student->attempts()
+            ->whereIn('status', ['submitted', 'timed_out'])
+            ->get()
+            ->countBy('question_set_id');
+
         $exams = ExamAccess::whereIn('class_id', $classIds)
             ->with(['questionSet.subject', 'questionSet.questions'])
             ->orderBy('scheduled_at')
             ->get()
-            ->map(fn($ea) => (object) [
-                'id'                 => $ea->id,
-                'subject'            => $ea->questionSet->subject->name ?? '—',
-                'title'              => $ea->questionSet->title,
-                'time_limit_minutes' => $ea->questionSet->time_limit_minutes,
-                'total_marks'        => $ea->questionSet->questions->sum('marks'),
-                'scheduled_at'       => $ea->scheduled_at,
-                'expires_at'         => $ea->expires_at,
-            ]);
+            ->map(function ($ea) use ($isPro, $attemptCounts) {
+                $isPremium = $ea->questionSet->is_premium;
+                $attemptsUsed = $attemptCounts->get($ea->question_set_id, 0);
+                $isLocked = (! $isPro) && ($isPremium || $attemptsUsed >= 1);
 
-        return view('student.exams', compact('exams'));
+                return (object) [
+                    'id'                 => $ea->id,
+                    'subject'            => $ea->questionSet->subject->name ?? '—',
+                    'title'              => $ea->questionSet->title,
+                    'time_limit_minutes' => $ea->questionSet->time_limit_minutes,
+                    'total_marks'        => $ea->questionSet->questions->sum('marks'),
+                    'scheduled_at'       => $ea->scheduled_at,
+                    'expires_at'         => $ea->expires_at,
+                    'is_premium'         => $isPremium,
+                    'is_locked'          => $isLocked,
+                ];
+            });
+
+        return view('student.exams', compact('exams', 'isPro'));
     }
 
     public function result()
@@ -163,6 +201,23 @@ class StudentController extends Controller
         abort_unless($enrolledClassIds->contains($examAccess->class_id), 403);
 
         abort_unless($examAccess->isActive(), 403, 'This exam is not currently available.');
+        // ─── GATE: premium exams / re-attempts require an active subscription ─
+        $isPro = $student->isPro();
+        $isPremium = $examAccess->questionSet->is_premium;
+        $alreadyAttempted = $student->attempts()
+            ->where('question_set_id', $examAccess->question_set_id)
+            ->whereIn('status', ['submitted', 'timed_out'])
+            ->exists();
+
+        if (! $isPro && $isPremium) {
+            return redirect()->route('student.plans')
+                ->with('error', 'This is a premium exam. Subscribe to unlock it.');
+        }
+
+        if (! $isPro && $alreadyAttempted) {
+            return redirect()->route('student.plans')
+                ->with('error', 'You\'ve used your free attempt for this exam. Subscribe for unlimited re-attempts.');
+        }
 
         $questionSet = $examAccess->questionSet;
         $questions   = $questionSet->questions;
