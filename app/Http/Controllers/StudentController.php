@@ -214,6 +214,7 @@ if ($isPro) {
             ->latest('submitted_at')
             ->get()
             ->map(fn($attempt) => (object) [
+                'id' => $attempt->id,
                 'subject'      => $attempt->questionSet->subject->name ?? '—',
                 'title'        => $attempt->questionSet->title ?? '—',
                 'submitted_at' => $attempt->submitted_at,
@@ -360,4 +361,40 @@ if (! $isPro) {
         return redirect()->route('student.result')
             ->with('success', 'Exam submitted! You scored ' . $score . ' out of ' . $attempt->total_marks . '.');
     }
+    public function resultAnalysis(Attempt $attempt)
+{
+    $student = auth()->user();
+
+    // Make sure this attempt belongs to the logged-in student
+    abort_unless($attempt->student_id === $student->id, 403);
+
+    // Only completed attempts can be analyzed
+    abort_unless(
+        in_array($attempt->status, ['submitted', 'timed_out']),
+        404
+    );
+
+    $attempt->load([
+        'questionSet.subject',
+        'answers.question',
+    ]);
+
+    $answers = $attempt->answers;
+
+    $correctAnswers = $answers->where('is_correct', true)->count();
+    $wrongAnswers   = $answers->where('is_correct', false)->count();
+
+    $totalQuestions = $answers->count();
+
+    $unanswered = $answers->whereNull('selected_option')->count();
+
+    return view('student.result-analysis', compact(
+        'attempt',
+        'answers',
+        'correctAnswers',
+        'wrongAnswers',
+        'totalQuestions',
+        'unanswered'
+    ));
+}
 }

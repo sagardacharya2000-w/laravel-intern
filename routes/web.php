@@ -68,6 +68,8 @@ Route::middleware(['auth', 'role:student', 'isActive'])->group(function () {
     Route::post('/student/courses/enroll', [StudentController::class, 'enroll'])->name('student.courses.enroll');
     Route::get('/student/exams', [StudentController::class, 'exams'])->name('student.exams');
     Route::get('/student/results', [StudentController::class, 'result'])->name('student.result');
+    Route::get('/student/results/{attempt}/analysis', [StudentController::class, 'resultAnalysis'])
+    ->name('student.result.analysis');
 
     Route::get('/student/profile', [StudentController::class, 'profile'])->name('student.profile');
     Route::put('/student/profile', [StudentController::class, 'updateProfile'])->name('student.profile.update');

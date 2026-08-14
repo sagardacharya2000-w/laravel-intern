@@ -49,6 +49,7 @@
                         <th>Total Marks</th>
                         <th>Percentage</th>
                         <th>Result</th>
+                        <th>Analysis</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -67,6 +68,14 @@
                                 <span class="badge badge-gray">Fail</span>
                             @endif
                         </td>
+                        <td>
+                      <a href="{{ route('student.result.analysis', $attempt->id) }}"
+                   class="btn-secondary"
+                    style="padding:6px 12px;font-size:12px;">
+                         <i class="ti ti-chart-bar"></i>
+                            View Analysis
+                               </a>
+                           </td>
                     </tr>
                     @endforeach
                 </tbody>
