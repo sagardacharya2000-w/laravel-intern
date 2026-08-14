@@ -42,7 +42,7 @@ $proAnytimeExams = collect();
 
 if ($isPro) {
     $proAnytimeExams = $examAccesses
-        ->filter(fn($ea) => ! $ea->isExpired())
+        ->filter(fn($ea) => !  $ea->questionSet->is_premium)
         ->sortBy('scheduled_at')
         ->take(3)
         ->map(function ($ea) {
