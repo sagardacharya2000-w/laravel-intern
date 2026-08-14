@@ -73,6 +73,15 @@ class StudentController extends Controller
         $averageScore   = $completedCount
             ? round($completedAttempts->avg(fn($a) => $a->percentage()))
             : 0;
+            
+            // Pro Performance Tracking
+           $bestScore = $completedCount
+           ? round($completedAttempts->max(fn($a) => $a->percentage()))
+              : 0;
+
+          $passedCount = $completedAttempts->filter(
+               fn($a) => $a->percentage() >= 40
+               )->count();
 
         $attemptHistory = $completedAttempts->take(5)->map(fn($attempt) => (object) [
             'subject'     => $attempt->questionSet->subject->name ?? '—',
@@ -88,6 +97,8 @@ class StudentController extends Controller
             'upcomingCount',
             'completedCount',
             'averageScore',
+             'bestScore',
+             'passedCount',
             'availableExams',
             'attemptHistory',
             'isPro',

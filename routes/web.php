@@ -17,6 +17,8 @@ Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+ Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
+
 
 // Teacher routes
 Route::middleware(['auth', 'role:teacher', 'isActive'])->group(function () {
@@ -77,5 +79,5 @@ Route::middleware(['auth', 'role:student', 'isActive'])->group(function () {
         ->name('student.exam-taking.submit');
     Route::get('/student/plans', [PaymentController::class, 'plans'])->name('student.plans');
     Route::post('/student/subscribe/{plan}', [PaymentController::class, 'subscribe'])->name('student.subscribe');
-    Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
+
 });

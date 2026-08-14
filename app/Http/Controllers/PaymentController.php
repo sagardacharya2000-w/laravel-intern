@@ -25,8 +25,8 @@ class PaymentController extends Controller
         $payment = Payment::create([
             'user_id' => $user->id,
             'plan_id' => $plan->id,
-            'amount' => $plan->price,
-            'status' => 'pending',
+            'amount'  => $plan->price,
+            'status'  => 'pending',
         ]);
 
         try {
@@ -35,14 +35,14 @@ class PaymentController extends Controller
                 purchaseOrderId: 'PAYMENT-' . $payment->id,
                 purchaseOrderName: $plan->name . ' Subscription',
                 customerInfo: [
-                    'name' => $user->name,
+                    'name'  => $user->name,
                     'email' => $user->email,
                     'phone' => $user->phone ?: '9800000000',
                 ],
             );
         } catch (RuntimeException $e) {
             $payment->update([
-                'status' => 'failed',
+                'status'         => 'failed',
                 'failure_reason' => $e->getMessage(),
             ]);
 
@@ -62,12 +62,15 @@ class PaymentController extends Controller
 
         $payment = Payment::where('khalti_pidx', $pidx)->firstOrFail();
 
+        // If the payment is already processed, redirect directly to /student
         if ($payment->status !== 'pending') {
-            $view = $payment->isSuccessful() ? 'payment.success' : 'payment.failed';
+            if ($payment->isSuccessful()) {
+                return redirect('/student')
+                    ->with('success', 'Your subscription is already active!');
+            }
 
-            return response()
-                ->view($view, compact('payment'))
-                ->header('Cache-Control', 'no-store, no-cache, must-revalidate');
+            return redirect('/student')
+                ->with('error', 'This payment failed or was previously cancelled.');
         }
 
         $result = $khalti->lookup($pidx);
@@ -81,32 +84,34 @@ class PaymentController extends Controller
 
         if (($result['status'] ?? null) !== 'Completed') {
             $payment->update([
-                'status' => 'failed',
+                'status'         => 'failed',
                 'failure_reason' => $result['status'] ?? 'unknown',
             ]);
 
-            return response()
-                ->view('payment.failed', compact('payment'))
-                ->header('Cache-Control', 'no-store, no-cache, must-revalidate');
+            return redirect('/student')
+                ->with('error', 'Payment verification failed. Status: ' . ($result['status'] ?? 'Unknown'));
         }
 
-        $subscription = Subscription::create([
-            'user_id' => $payment->user_id,
-            'plan_id' => $payment->plan_id,
-            'status' => 'active',
-            'starts_at' => now(),
-            'expires_at' => $payment->plan->expiryFromNow(),
-        ]);
+        // Create Active Subscription for Student
+        $plan = SubscriptionPlan::findOrFail($payment->plan_id);
 
+                  $subscription = Subscription::create([
+               'user_id'    => $payment->user_id,
+                 'plan_id'    => $payment->plan_id,
+             'status'     => 'active',
+               'starts_at'  => now(),
+               'expires_at' => $plan->expiryFromNow(),
+]);
+        // Update Payment Record
         $payment->update([
-            'status' => 'success',
+            'status'          => 'success',
             'subscription_id' => $subscription->id,
-            'khalti_txn_id' => $result['transaction_id'] ?? null,
-            'paid_at' => now(),
+            'khalti_txn_id'   => $result['transaction_id'] ?? null,
+            'paid_at'         => now(),
         ]);
 
-        return response()
-            ->view('payment.success', compact('payment'))
-            ->header('Cache-Control', 'no-store, no-cache, must-revalidate');
+        // Redirect directly to Student Dashboard with success alert
+        return redirect('/student')
+            ->with('success', 'Payment successful! Your Pro subscription is now active.');
     }
 }

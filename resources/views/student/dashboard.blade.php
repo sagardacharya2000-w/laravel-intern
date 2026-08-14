@@ -39,7 +39,7 @@
                     </div>
                 </div>
                 <div style="text-align:right;">
-                    <div style="color:#fff;font-size:24px;font-weight:800;">{{ max($daysLeft, 0) }}</div>
+                    <div style="color:#fff;font-size:24px;font-weight:800;">{{ max((int)$daysLeft, 0) }}</div>
                     <div style="color:rgba(255,255,255,0.75);font-size:12px;">days remaining</div>
                 </div>
             </div>
@@ -60,6 +60,49 @@
             </div>
         </div>
     @endif
+    {{-- Pro Benefits --}}
+          @if($isPro)
+    <div class="panel">
+        <div class="panel-header">
+            <h3>🚀 Your Pro Benefits</h3>
+        </div>
+
+        <div style="padding:20px 24px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="color:#16a34a;font-size:20px;">✓</span>
+                    <span style="font-size:14px;color:#374151;">
+                        Unlimited Exam Attempts
+                    </span>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="color:#16a34a;font-size:20px;">✓</span>
+                    <span style="font-size:14px;color:#374151;">
+                        Access to Premium Exams
+                    </span>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="color:#16a34a;font-size:20px;">✓</span>
+                    <span style="font-size:14px;color:#374151;">
+                        Detailed Result Analysis
+                    </span>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="color:#16a34a;font-size:20px;">✓</span>
+                    <span style="font-size:14px;color:#374151;">
+                        Performance Tracking
+                    </span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+@endif
+
 
     <div class="stat-grid">
         <div class="stat-card">
@@ -75,6 +118,31 @@
             <div class="stat-value">{{ $averageScore }}%</div>
         </div>
     </div>
+     {{-- Pro Performance --}}
+    @if($isPro)
+        <div class="stat-grid">
+
+            <div class="stat-card">
+                <div class="stat-label">
+                    <i class="ti ti-trophy"></i> Best Score
+                </div>
+                <div class="stat-value">
+                    {{ $bestScore }}%
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">
+                    <i class="ti ti-circle-check"></i> Exams Passed
+                </div>
+                <div class="stat-value">
+                    {{ $passedCount }}
+                </div>
+            </div>
+
+        </div>
+    @endif
+
 
     <div class="panel">
         <div class="panel-header">
