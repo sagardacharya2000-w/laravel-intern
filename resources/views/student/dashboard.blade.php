@@ -143,6 +143,101 @@
         </div>
     @endif
 
+    @if($isPro)
+    <div class="panel">
+        <div class="panel-header">
+            <h3>📊 Performance Summary</h3>
+        </div>
+
+        <div style="padding:20px 24px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;">
+
+                <div>
+                    <div style="font-size:13px;color:#6b7280;margin-bottom:6px;">
+                        Highest Marks
+                    </div>
+                    <div style="font-size:22px;font-weight:800;color:#111827;">
+                        {{ $highestScore }}
+                    </div>
+                </div>
+
+                <div>
+                    <div style="font-size:13px;color:#6b7280;margin-bottom:6px;">
+                        Total Marks Scored
+                    </div>
+                    <div style="font-size:22px;font-weight:800;color:#111827;">
+                        {{ $totalMarksScored }}
+                    </div>
+                </div>
+
+                <div>
+                    <div style="font-size:13px;color:#6b7280;margin-bottom:6px;">
+                        Total Marks Available
+                    </div>
+                    <div style="font-size:22px;font-weight:800;color:#111827;">
+                        {{ $totalMarksPossible }}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+@endif
+
+ {{-- Pro Anytime Exams --}}
+@if($isPro && $proAnytimeExams->isNotEmpty())
+    <div class="panel">
+        <div class="panel-header">
+            <h3>⚡ Pro Anytime Exams</h3>
+        </div>
+
+        <div style="padding:20px 24px;">
+            <p style="margin:0 0 18px;color:#6b7280;font-size:13px;">
+                As a Pro member, you can take these exams anytime.
+            </p>
+
+            <div class="exam-card-grid">
+                @foreach($proAnytimeExams as $exam)
+                    <div class="exam-card" style="position:relative;">
+
+                        <span style="position:absolute;top:14px;right:14px;background:#fbbf24;color:#111827;font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;">
+                            PRO
+                        </span>
+
+                        <div class="exam-card-subject">
+                            {{ $exam->subject }}
+                        </div>
+
+                        <div class="exam-card-title">
+                            {{ $exam->title }}
+                        </div>
+
+                        <div class="exam-card-meta">
+                            <span>
+                                <i class="ti ti-clock"></i>
+                                {{ $exam->time_limit_minutes }} min
+                            </span>
+
+                            <span>
+                                <i class="ti ti-star"></i>
+                                {{ $exam->total_marks }} marks
+                            </span>
+                        </div>
+
+                        <a href="{{ route('student.exam-taking', $exam->exam_access_id) }}"
+                           class="btn-primary"
+                           style="width:100%;justify-content:center;">
+                            <i class="ti ti-player-play"></i>
+                            Take Exam Anytime
+                        </a>
+
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+@endif
+
 
     <div class="panel">
         <div class="panel-header">

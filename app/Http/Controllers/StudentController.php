@@ -37,6 +37,26 @@ class StudentController extends Controller
             ->get()
             ->countBy('question_set_id');
 
+            // Pro-only: exams that can be taken anytime
+$proAnytimeExams = collect();
+
+if ($isPro) {
+    $proAnytimeExams = $examAccesses
+        ->filter(fn($ea) => ! $ea->isExpired())
+        ->sortBy('scheduled_at')
+        ->take(3)
+        ->map(function ($ea) {
+            return (object) [
+                'exam_access_id'     => $ea->id,
+                'subject'            => $ea->questionSet->subject->name ?? '—',
+                'title'              => $ea->questionSet->title,
+                'time_limit_minutes' => $ea->questionSet->time_limit_minutes,
+                'total_marks'        => $ea->questionSet->questions->sum('marks'),
+            ];
+        })
+        ->values();
+}
+
         $availableExams = $examAccesses
             ->filter(fn($ea) => ! $ea->isExpired())
             ->sortBy('scheduled_at')
@@ -73,7 +93,7 @@ class StudentController extends Controller
         $averageScore   = $completedCount
             ? round($completedAttempts->avg(fn($a) => $a->percentage()))
             : 0;
-            
+
             // Pro Performance Tracking
            $bestScore = $completedCount
            ? round($completedAttempts->max(fn($a) => $a->percentage()))
@@ -82,6 +102,10 @@ class StudentController extends Controller
           $passedCount = $completedAttempts->filter(
                fn($a) => $a->percentage() >= 40
                )->count();
+
+               $highestScore = $completedAttempts->max('score') ?? 0;
+                 $totalMarksScored = $completedAttempts->sum('score');
+                   $totalMarksPossible = $completedAttempts->sum('total_marks');
 
         $attemptHistory = $completedAttempts->take(5)->map(fn($attempt) => (object) [
             'subject'     => $attempt->questionSet->subject->name ?? '—',
@@ -95,14 +119,18 @@ class StudentController extends Controller
         return view('student.dashboard', compact(
             'enrolledClass',
             'upcomingCount',
+            'proAnytimeExams',
             'completedCount',
             'averageScore',
-             'bestScore',
-             'passedCount',
             'availableExams',
             'attemptHistory',
             'isPro',
-            'activeSubscription'
+            'activeSubscription',
+             'bestScore',
+             'passedCount',
+             'highestScore',
+              'totalMarksScored',
+              'totalMarksPossible'
         ));
     }
 
@@ -211,9 +239,18 @@ class StudentController extends Controller
         $enrolledClassIds = $student->enrolledClasses()->pluck('classes.id');
         abort_unless($enrolledClassIds->contains($examAccess->class_id), 403);
 
-        abort_unless($examAccess->isActive(), 403, 'This exam is not currently available.');
-        // ─── GATE: premium exams / re-attempts require an active subscription ─
         $isPro = $student->isPro();
+
+if (! $isPro) {
+    abort_unless(
+        $examAccess->isActive(),
+        403,
+        'This exam is not currently available.'
+    );
+}
+
+        // ─── GATE: premium exams / re-attempts require an active subscription ─
+
         $isPremium = $examAccess->questionSet->is_premium;
         $alreadyAttempted = $student->attempts()
             ->where('question_set_id', $examAccess->question_set_id)
@@ -265,7 +302,15 @@ class StudentController extends Controller
         $student = auth()->user();
 
         // ─── GATE 1: exam window must still be open ─────────────
-        abort_unless($examAccess->isActive(), 403, 'This exam window has closed.');
+        $isPro = $student->isPro();
+
+          if (! $isPro) {
+    abort_unless(
+        $examAccess->isActive(),
+        403,
+        'This exam window has closed.'
+            );
+             }
 
         $attempt = Attempt::where('student_id', $student->id)
             ->where('question_set_id', $examAccess->question_set_id)
