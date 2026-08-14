@@ -2,13 +2,6 @@
     <x-slot name="title">Enroll Class — Online Siksha</x-slot>
     <x-slot name="pageTitle">Enroll Class</x-slot>
 
-    @if (session('success'))
-        <div class="alert alert-success"
-            style="margin-bottom:16px;padding:12px 16px;background:#dcfce7;color:#166534;border-radius:8px;">
-            {{ session('success') }}
-        </div>
-    @endif
-
     {{-- Currently Enrolled Class --}}
     <div class="panel" style="margin-bottom: 28px;">
         <div class="panel-header">
