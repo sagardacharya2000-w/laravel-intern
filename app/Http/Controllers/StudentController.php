@@ -37,25 +37,25 @@ class StudentController extends Controller
             ->get()
             ->countBy('question_set_id');
 
-            // Pro-only: exams that can be taken anytime
-$proAnytimeExams = collect();
+        // Pro-only: exams that can be taken anytime
+        $proAnytimeExams = collect();
 
-if ($isPro) {
-    $proAnytimeExams = $examAccesses
-        ->filter(fn($ea) => !  $ea->questionSet->is_premium)
-        ->sortBy('scheduled_at')
-        ->take(3)
-        ->map(function ($ea) {
-            return (object) [
-                'exam_access_id'     => $ea->id,
-                'subject'            => $ea->questionSet->subject->name ?? '—',
-                'title'              => $ea->questionSet->title,
-                'time_limit_minutes' => $ea->questionSet->time_limit_minutes,
-                'total_marks'        => $ea->questionSet->questions->sum('marks'),
-            ];
-        })
-        ->values();
-}
+        if ($isPro) {
+            $proAnytimeExams = $examAccesses
+                ->filter(fn($ea) => ! $ea->questionSet->is_premium)
+                ->sortBy('scheduled_at')
+                ->take(3)
+                ->map(function ($ea) {
+                    return (object) [
+                        'exam_access_id'     => $ea->id,
+                        'subject'            => $ea->questionSet->subject->name ?? '—',
+                        'title'              => $ea->questionSet->title,
+                        'time_limit_minutes' => $ea->questionSet->time_limit_minutes,
+                        'total_marks'        => $ea->questionSet->questions->sum('marks'),
+                    ];
+                })
+                ->values();
+        }
 
         $availableExams = $examAccesses
             ->filter(fn($ea) => ! $ea->isExpired())
@@ -94,18 +94,18 @@ if ($isPro) {
             ? round($completedAttempts->avg(fn($a) => $a->percentage()))
             : 0;
 
-            // Pro Performance Tracking
-           $bestScore = $completedCount
-           ? round($completedAttempts->max(fn($a) => $a->percentage()))
-              : 0;
+        // Pro Performance Tracking
+        $bestScore = $completedCount
+            ? round($completedAttempts->max(fn($a) => $a->percentage()))
+            : 0;
 
-          $passedCount = $completedAttempts->filter(
-               fn($a) => $a->percentage() >= 40
-               )->count();
+        $passedCount = $completedAttempts->filter(
+            fn($a) => $a->percentage() >= 40
+        )->count();
 
-               $highestScore = $completedAttempts->max('score') ?? 0;
-                 $totalMarksScored = $completedAttempts->sum('score');
-                   $totalMarksPossible = $completedAttempts->sum('total_marks');
+        $highestScore = $completedAttempts->max('score') ?? 0;
+        $totalMarksScored = $completedAttempts->sum('score');
+        $totalMarksPossible = $completedAttempts->sum('total_marks');
 
         $attemptHistory = $completedAttempts->take(5)->map(fn($attempt) => (object) [
             'subject'     => $attempt->questionSet->subject->name ?? '—',
@@ -126,11 +126,11 @@ if ($isPro) {
             'attemptHistory',
             'isPro',
             'activeSubscription',
-             'bestScore',
-             'passedCount',
-             'highestScore',
-              'totalMarksScored',
-              'totalMarksPossible'
+            'bestScore',
+            'passedCount',
+            'highestScore',
+            'totalMarksScored',
+            'totalMarksPossible'
         ));
     }
 
@@ -149,17 +149,19 @@ if ($isPro) {
             'class_code' => ['required', 'string'],
         ]);
 
+        // A student can only ever belong to one class. If they already have
+        // one, block enrollment entirely — don't silently swap or add a second.
+        if ($student->enrolledClasses()->exists()) {
+            return back()->withErrors([
+                'class_code' => 'You are already enrolled in a class. Contact your teacher or admin if you need to switch classes.',
+            ])->withInput();
+        }
+
         $class = SchoolClass::where('class_code', $validated['class_code'])->first();
 
         if (! $class) {
             return back()->withErrors([
                 'class_code' => 'No class found with that code.',
-            ])->withInput();
-        }
-
-        if ($student->enrolledClasses()->where('classes.id', $class->id)->exists()) {
-            return back()->withErrors([
-                'class_code' => 'You are already enrolled in this class.',
             ])->withInput();
         }
 
@@ -242,13 +244,11 @@ if ($isPro) {
 
         $isPro = $student->isPro();
 
-if (! $isPro) {
-    abort_unless(
-        $examAccess->isActive(),
-        403,
-        'This exam is not currently available.'
-    );
-}
+        abort_unless(
+            $examAccess->isActive(),
+            403,
+            'This exam is not currently available.'
+        );
 
         // ─── GATE: premium exams / re-attempts require an active subscription ─
 
@@ -303,15 +303,12 @@ if (! $isPro) {
         $student = auth()->user();
 
         // ─── GATE 1: exam window must still be open ─────────────
-        $isPro = $student->isPro();
-
-          if (! $isPro) {
-    abort_unless(
-        $examAccess->isActive(),
-        403,
-        'This exam window has closed.'
-            );
-             }
+        // ─── GATE 1: exam window must still be open ─────────────
+        abort_unless(
+            $examAccess->isActive(),
+            403,
+            'This exam window has closed.'
+        );
 
         $attempt = Attempt::where('student_id', $student->id)
             ->where('question_set_id', $examAccess->question_set_id)
@@ -362,39 +359,39 @@ if (! $isPro) {
             ->with('success', 'Exam submitted! You scored ' . $score . ' out of ' . $attempt->total_marks . '.');
     }
     public function resultAnalysis(Attempt $attempt)
-{
-    $student = auth()->user();
+    {
+        $student = auth()->user();
 
-    // Make sure this attempt belongs to the logged-in student
-    abort_unless($attempt->student_id === $student->id, 403);
+        // Make sure this attempt belongs to the logged-in student
+        abort_unless($attempt->student_id === $student->id, 403);
 
-    // Only completed attempts can be analyzed
-    abort_unless(
-        in_array($attempt->status, ['submitted', 'timed_out']),
-        404
-    );
+        // Only completed attempts can be analyzed
+        abort_unless(
+            in_array($attempt->status, ['submitted', 'timed_out']),
+            404
+        );
 
-    $attempt->load([
-        'questionSet.subject',
-        'answers.question',
-    ]);
+        $attempt->load([
+            'questionSet.subject',
+            'answers.question',
+        ]);
 
-    $answers = $attempt->answers;
+        $answers = $attempt->answers;
 
-    $correctAnswers = $answers->where('is_correct', true)->count();
-    $wrongAnswers   = $answers->where('is_correct', false)->count();
+        $correctAnswers = $answers->where('is_correct', true)->count();
+        $wrongAnswers   = $answers->where('is_correct', false)->count();
 
-    $totalQuestions = $answers->count();
+        $totalQuestions = $answers->count();
 
-    $unanswered = $answers->whereNull('selected_option')->count();
+        $unanswered = $answers->whereNull('selected_option')->count();
 
-    return view('student.result-analysis', compact(
-        'attempt',
-        'answers',
-        'correctAnswers',
-        'wrongAnswers',
-        'totalQuestions',
-        'unanswered'
-    ));
-}
+        return view('student.result-analysis', compact(
+            'attempt',
+            'answers',
+            'correctAnswers',
+            'wrongAnswers',
+            'totalQuestions',
+            'unanswered'
+        ));
+    }
 }
