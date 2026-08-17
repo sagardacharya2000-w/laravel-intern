@@ -46,10 +46,15 @@ class KhaltiService
             'pidx' => $pidx,
         ]);
 
-        if ($response->failed()) {
+        $data = $response->json();
+
+        // Khalti sometimes returns a non-2xx status even for a valid, informative
+        // response (e.g. a cancelled payment) — as long as it gave us a real
+        // 'status' field back, trust that over the raw HTTP status code.
+        if ($response->failed() && ! isset($data['status'])) {
             throw new RuntimeException('Khalti lookup failed: ' . $response->body());
         }
 
-        return $response->json();
+        return $data;
     }
 }
